@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCESA / Vive Claro · Junio 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --rojo:       #c42e20;
+    --borgona:    #510000;
+    --negro:      #0f0f0f;
+    --gris-osc:   #1c1c1c;
+    --gris-med:   #3a3a3a;
+    --gris:       #757575;
+    --gris-borde: #e4e4e4;
+    --fondo:      #f6f5f4;
+    --blanco:     #ffffff;
+    --pos:        #2d8a5e;
+    --pos-bg:     #e8f5ee;
+    --neg:        #c42e20;
+    --neg-bg:     #fdecea;
+    --neu:        #8a6d00;
+    --neu-bg:     #fdf6e3;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:var(--fondo); color:var(--negro); line-height:1.5; -webkit-font-smoothing:antialiased; }
+
+  /* ─── MÓDULO SUPERIOR ─── */
+  .top-bar {
+    background:var(--negro);
+    padding:0 48px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    height:64px;
+    position:sticky;
+    top:0;
+    z-index:200;
+  }
+  .top-logos { display:flex; align-items:center; gap:20px; }
+  .logo-vc { display:flex; align-items:center; gap:10px; }
+  .logo-vc-mark { width:32px; height:32px; background:var(--rojo); border-radius:5px; display:flex; align-items:center; justify-content:center; }
+  .logo-vc-text { font-family:'Montserrat',sans-serif; font-weight:900; font-size:15px; color:#fff; letter-spacing:-0.01em; line-height:1.1; }
+  .logo-vc-text span { display:block; font-weight:400; font-size:9px; color:rgba(255,255,255,0.4); letter-spacing:0.12em; text-transform:uppercase; margin-top:1px; }
+  .logo-sep { width:1px; height:28px; background:rgba(255,255,255,0.15); }
+  .logo-crop { font-family:'Montserrat',sans-serif; font-weight:800; font-size:13px; color:rgba(255,255,255,0.5); letter-spacing:0.08em; }
+  .logo-crop span { display:block; font-size:8px; font-weight:400; letter-spacing:0.1em; color:rgba(255,255,255,0.28); text-transform:uppercase; margin-top:2px; }
+  .mes-badge { display:inline-flex; align-items:center; gap:6px; background:var(--rojo); color:#fff; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border-radius:20px; }
+
+  /* ─── TABS PRINCIPALES ─── */
+  .main-tabs {
+    background:var(--gris-osc);
+    padding:0 48px;
+    display:flex;
+    gap:0;
+    position:sticky;
+    top:64px;
+    z-index:190;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .main-tab {
+    padding:0 24px;
+    height:46px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.38);
+    background:transparent;
+    border:none;
+    border-bottom:2px solid transparent;
+    cursor:pointer;
+    transition:all .18s;
+    white-space:nowrap;
+  }
+  .main-tab svg { opacity:.5; transition:opacity .18s; }
+  .main-tab:hover { color:rgba(255,255,255,0.7); }
+  .main-tab:hover svg { opacity:.7; }
+  .main-tab.active { color:#fff; border-bottom-color:var(--rojo); }
+  .main-tab.active svg { opacity:1; }
+
+  /* ─── MÓDULO WRAPPER ─── */
+  .module { display:none; }
+  .module.visible { display:block; }
+
+  /* ══════════════════════════════════════════
+     MÓDULO 1: NET SENTIMENT
+  ══════════════════════════════════════════ */
+
+  .hero { background:linear-gradient(135deg,var(--borgona) 0%,#2a0000 60%,#0f0f0f 100%); padding:52px 48px 56px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-100px; right:-100px; width:500px; height:500px; border-radius:50%; border:80px solid rgba(196,46,32,0.1); }
+  .hero::after  { content:''; position:absolute; bottom:-60px; left:-60px; width:300px; height:300px; border-radius:50%; border:50px solid rgba(255,255,255,0.03); }
+  .hero-inner { position:relative; z-index:1; max-width:1200px; margin:0 auto; }
+  .hero-eyebrow { font-size:10px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--rojo); margin-bottom:14px; }
+  .hero-titulo { font-family:'Montserrat',sans-serif; font-size:42px; font-weight:900; color:#fff; line-height:1.1; letter-spacing:-0.02em; margin-bottom:6px; }
+  .hero-titulo em { font-style:normal; color:var(--rojo); }
+  .hero-sub { font-size:13px; color:rgba(255,255,255,0.45); margin-bottom:44px; }
+  .hero-kpis { display:flex; gap:0; flex-wrap:wrap; }
+  .hero-kpi { padding:0 32px 0 0; margin-right:32px; border-right:1px solid rgba(255,255,255,0.1); }
+  .hero-kpi:last-child { border-right:none; margin-right:0; padding-right:0; }
+  .hero-kpi-label { font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:5px; }
+  .hero-kpi-valor { font-family:'Montserrat',sans-serif; font-weight:900; font-size:13px; color:rgba(255,255,255,0.88); }
+
+  .filtros-bar { background:#fff; border-bottom:1px solid var(--gris-borde); padding:0 48px; display:flex; align-items:center; gap:24px; height:58px; position:sticky; top:110px; z-index:90; overflow-x:auto; }
+  .filtros-label { font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gris); flex-shrink:0; }
+  .filtros-grupo { display:flex; gap:5px; align-items:center; flex-shrink:0; }
+  .filtros-sep { width:1px; height:22px; background:var(--gris-borde); flex-shrink:0; }
+  .filtro-btn { padding:4px 13px; border-radius:20px; border:1.5px solid var(--gris-borde); background:transparent; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--gris); cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .filtro-btn:hover { border-color:var(--rojo); color:var(--rojo); }
+  .filtro-btn.active     { background:var(--rojo);   border-color:var(--rojo);   color:#fff; }
+  .filtro-btn.active-pos { background:var(--pos);    border-color:var(--pos);    color:#fff; }
+  .filtro-btn.active-neg { background:var(--neg);    border-color:var(--neg);    color:#fff; }
+  .filtro-btn.active-neu { background:var(--neu);    border-color:var(--neu);    color:#fff; }
+
+  /* ─── SELECTS DE PERÍODO (nuevo) ─── */
+  .filtro-select {
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    padding:5px 30px 5px 14px;
+    border-radius:20px;
+    border:1.5px solid var(--gris-borde);
+    background-color:transparent;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%23c42e20' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    background-size:10px 6px;
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    font-weight:700;
+    color:var(--rojo);
+    cursor:pointer;
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .filtro-select:hover { border-color:var(--rojo); }
+  .filtro-select:focus { outline:none; border-color:var(--rojo); box-shadow:0 0 0 3px rgba(196,46,32,.12); }
+
+  .ig-mes-select {
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    background-color:var(--rojo);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 9 6'><path d='M1 1l3.5 3.5L8 1' stroke='%23ffffff' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 13px center;
+    background-size:9px 6px;
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    padding:6px 30px 6px 14px;
+    border-radius:20px;
+    border:none;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .ig-mes-select:hover { background-color:#a92419; }
+  .ig-mes-select:focus { outline:none; box-shadow:0 0 0 3px rgba(196,46,32,.3); }
+
+  .resultados-count { margin-left:auto; font-size:12px; color:var(--gris); font-weight:500; flex-shrink:0; }
+  .resultados-count strong { color:var(--rojo); font-weight:700; }
+
+  .ns-main { max-width:1200px; margin:0 auto; padding:36px 48px 80px; }
+
+  .kpi-strip { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:14px; margin-bottom:24px; }
+  .kpi-card { background:#fff; border-radius:12px; padding:22px 22px 18px; border:1px solid var(--gris-borde); }
+  .kpi-card.principal { background:var(--rojo); border-color:var(--rojo); display:flex; flex-direction:column; justify-content:space-between; }
+  .kpi-eyebrow { font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--gris); margin-bottom:8px; }
+  .kpi-card.principal .kpi-eyebrow { color:rgba(255,255,255,0.6); }
+  .kpi-num { font-family:'Montserrat',sans-serif; font-weight:900; font-size:38px; letter-spacing:-0.03em; line-height:1; color:var(--negro); display:block; margin-bottom:4px; }
+  .kpi-card.principal .kpi-num { font-size:52px; color:#fff; }
+  .kpi-desc { font-size:11px; color:var(--gris); font-weight:500; }
+  .kpi-card.principal .kpi-desc { color:rgba(255,255,255,0.6); font-size:12px; }
+  .kpi-num.pos { color:var(--pos); }
+  .kpi-num.neg { color:var(--neg); }
+  .kpi-num.neu { color:var(--neu); }
+  .comp-badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; margin-top:6px; }
+  .comp-badge.up   { background:rgba(45,138,94,0.15); color:var(--pos); }
+  .comp-badge.down { background:rgba(196,46,32,0.12); color:#fff; opacity:.85; }
+  .comp-badge.same { background:rgba(138,109,0,0.12); color:var(--neu); }
+
+  .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
+  .chart-card { background:#fff; border-radius:12px; padding:26px 26px 22px; border:1px solid var(--gris-borde); }
+  .chart-card.full { grid-column:1 / -1; }
+  .chart-titulo { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); margin-bottom:20px; }
+  .chart-area { position:relative; height:250px; }
+  .chart-area.tall { height:290px; }
+  .chart-legend { display:flex; gap:18px; margin-top:14px; justify-content:center; flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--gris); font-weight:500; }
+  .legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+  .comp-card { background:#fff; border-radius:12px; padding:26px; border:1px solid var(--gris-borde); margin-bottom:18px; }
+  .comp-titulo { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); margin-bottom:20px; }
+  .comp-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .comp-mes { border-radius:10px; padding:20px; background:var(--fondo); }
+  .comp-mes-label { font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--gris); margin-bottom:10px; }
+  .comp-mes-net { font-family:'Montserrat',sans-serif; font-weight:900; font-size:36px; letter-spacing:-0.03em; color:var(--negro); margin-bottom:4px; }
+  .comp-mes-net.good { color:var(--pos); }
+  .comp-mes-net.bad  { color:var(--neg); }
+  .comp-mes-detail { font-size:11px; color:var(--gris); }
+  .comp-bars { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .comp-bar-row { display:flex; align-items:center; gap:10px; }
+  .comp-bar-label { font-size:11px; color:var(--gris); width:64px; text-align:right; font-weight:500; }
+  .comp-bar-track { flex:1; height:8px; background:#efefef; border-radius:4px; overflow:hidden; }
+  .comp-bar-fill  { height:100%; border-radius:4px; }
+  .comp-bar-val   { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; color:var(--gris); width:28px; }
+
+  .ranking-card { background:#fff; border-radius:12px; border:1px solid var(--gris-borde); overflow:hidden; margin-bottom:18px; }
+  .ranking-header { padding:18px 26px 14px; border-bottom:1px solid var(--fondo); }
+  .ranking-titulo { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); }
+  .ranking-body { padding:4px 0; }
+  .ranking-row { display:grid; grid-template-columns:32px 1fr 140px 36px; align-items:center; gap:12px; padding:9px 26px; border-bottom:1px solid var(--fondo); transition:background .1s; }
+  .ranking-row:last-child { border-bottom:none; }
+  .ranking-row:hover { background:var(--fondo); }
+  .ranking-num { font-family:'Montserrat',sans-serif; font-weight:800; font-size:17px; color:#ddd; text-align:center; }
+  .ranking-medio-nombre { font-size:13px; font-weight:600; color:var(--negro); }
+  .ranking-medio-tipo   { font-size:10px; color:var(--gris); margin-top:1px; }
+  .ranking-bar-track { height:5px; background:var(--fondo); border-radius:3px; overflow:hidden; }
+  .ranking-bar-fill  { height:100%; border-radius:3px; background:var(--rojo); }
+  .ranking-count { font-family:'Montserrat',sans-serif; font-weight:700; font-size:13px; color:var(--rojo); text-align:right; }
+
+  .tabla-card { background:#fff; border-radius:12px; border:1px solid var(--gris-borde); overflow:hidden; }
+  .tabla-header { padding:18px 26px 14px; border-bottom:1px solid var(--fondo); display:flex; align-items:center; justify-content:space-between; }
+  .tabla-titulo { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); }
+  .search-input { padding:6px 14px; border:1.5px solid var(--gris-borde); border-radius:20px; font-family:'Inter',sans-serif; font-size:12px; color:var(--negro); outline:none; width:210px; transition:border-color .15s; }
+  .search-input:focus { border-color:var(--rojo); }
+  .search-input::placeholder { color:var(--gris); }
+  .tabla-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th { background:var(--fondo); padding:9px 14px; text-align:left; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); border-bottom:1px solid var(--gris-borde); white-space:nowrap; }
+  tbody td { padding:11px 14px; border-bottom:1px solid var(--fondo); color:#333; vertical-align:middle; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover td { background:#fafafa; }
+  .badge { display:inline-flex; align-items:center; gap:3px; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; }
+  .badge-pos { background:var(--pos-bg); color:var(--pos); }
+  .badge-neg { background:var(--neg-bg); color:var(--neg); }
+  .badge-neu { background:var(--neu-bg); color:var(--neu); }
+  .canal-tag { display:inline-block; padding:2px 7px; border-radius:4px; font-size:10px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; background:var(--fondo); color:var(--gris); }
+  .fecha-cell { font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; color:var(--gris); white-space:nowrap; }
+  .titular-cell { max-width:400px; line-height:1.42; color:var(--negro); }
+  .medio-cell { font-weight:600; color:var(--gris-med); white-space:nowrap; }
+  .tabla-empty { padding:44px; text-align:center; color:var(--gris); font-size:14px; }
+
+  /* ══════════════════════════════════════════
+     MÓDULO 2: INFORME DE GESTIÓN
+  ══════════════════════════════════════════ */
+
+  .ig-hero {
+    background:linear-gradient(135deg,var(--borgona) 0%,#2a0000 60%,#0f0f0f 100%);
+    padding:48px 48px 44px;
+    position:relative;
+    overflow:hidden;
+  }
+  .ig-hero::before { content:''; position:absolute; top:-80px; right:-80px; width:380px; height:380px; border-radius:50%; border:60px solid rgba(196,46,32,0.1); }
+  .ig-hero::after  { content:''; position:absolute; bottom:-50px; left:-50px; width:200px; height:200px; border-radius:50%; border:36px solid rgba(255,255,255,0.03); }
+  .ig-hero-inner { position:relative; z-index:1; max-width:1200px; margin:0 auto; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+  .ig-hero-left .ig-eyebrow { font-size:9px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.38); margin-bottom:10px; }
+  .ig-hero-left .ig-titulo { font-family:'Montserrat',sans-serif; font-size:36px; font-weight:900; color:#fff; line-height:1.1; letter-spacing:-0.02em; }
+  .ig-hero-left .ig-titulo em { font-style:normal; color:var(--rojo); }
+  .ig-hero-left .ig-sub { font-size:13px; color:rgba(255,255,255,0.4); margin-top:6px; }
+  .ig-hero-right { display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .ig-hero-stats { display:flex; gap:24px; }
+  .ig-hero-stat { text-align:right; }
+  .ig-hero-stat .stat-val { font-family:'Montserrat',sans-serif; font-weight:900; font-size:22px; color:#fff; line-height:1; }
+  .ig-hero-stat .stat-label { font-size:9px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-top:3px; }
+
+  .ig-subnav {
+    background:#fff;
+    border-bottom:2px solid #f0eeec;
+    padding:0 48px;
+    display:flex;
+    gap:0;
+    position:sticky;
+    top:110px;
+    z-index:89;
+    overflow-x:auto;
+  }
+  .ig-tab {
+    padding:15px 20px;
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    font-weight:600;
+    color:#9a8f88;
+    background:transparent;
+    border:none;
+    border-bottom:2px solid transparent;
+    margin-bottom:-2px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .ig-tab:hover { color:var(--negro); }
+  .ig-tab.active { color:var(--rojo); border-bottom-color:var(--rojo); }
+  .ig-tab svg { width:14px; height:14px; }
+
+  .ig-body { max-width:1200px; margin:0 auto; padding:32px 48px 80px; }
+  .ig-section { display:none; }
+  .ig-section.visible { display:block; }
+
+  .ig-section-eyebrow { font-size:9px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:#9a8f88; margin-bottom:6px; }
+  .ig-section-heading { font-family:'Montserrat',sans-serif; font-size:22px; font-weight:900; color:var(--negro); letter-spacing:-0.01em; margin-bottom:24px; }
+
+  /* Obj cards */
+  .ig-obj-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; }
+  .ig-obj-card { background:#fff; border-radius:12px; padding:24px 20px; border:1px solid var(--gris-borde); position:relative; overflow:hidden; }
+  .ig-obj-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--rojo),var(--borgona)); }
+  .ig-obj-num { font-family:'Montserrat',sans-serif; font-size:48px; font-weight:900; color:#f4f3f2; letter-spacing:-0.05em; line-height:1; margin-bottom:8px; }
+  .ig-obj-icon { font-size:20px; margin-bottom:12px; }
+  .ig-obj-card p { font-size:13px; color:#555; line-height:1.65; }
+
+  /* Strategy */
+  .ig-strategy-list { display:flex; flex-direction:column; gap:10px; }
+  .ig-strategy-item { background:#fff; border-radius:12px; border:1px solid var(--gris-borde); padding:18px 20px; display:flex; align-items:flex-start; gap:14px; }
+  .ig-strategy-num { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:900; color:#fff; background:var(--rojo); min-width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .ig-strategy-item p { font-size:13px; color:#444; line-height:1.65; }
+
+  /* Tasks */
+  .ig-tasks-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px; }
+  .ig-task-card { background:#fff; border-radius:12px; padding:20px; border:1px solid var(--gris-borde); }
+  .ig-task-tag { display:inline-block; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:3px 10px; border-radius:5px; margin-bottom:12px; }
+  .ig-task-tag.medios     { background:var(--neg-bg); color:var(--rojo); }
+  .ig-task-tag.estrategia { background:var(--neu-bg); color:var(--neu); }
+  .ig-task-tag.comunidad  { background:var(--pos-bg); color:var(--pos); }
+  .ig-task-tag.editorial  { background:#ede8fd; color:#4a2fa0; }
+  .ig-task-tag.otro        { background:#f0eeec; color:#757575; }
+  .ig-task-tag.publicacion { background:var(--neg-bg); color:var(--rojo); }
+  .ig-task-tag.asuntos     { background:var(--neu-bg); color:var(--neu); }
+  .ig-task-tag.reunion     { background:var(--pos-bg); color:var(--pos); }
+  .ig-task-tag.entregable  { background:#ede8fd; color:#4a2fa0; }
+  .ig-task-card p { font-size:13px; color:#555; line-height:1.65; }
+
+  .ig-deliv-label { font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#9a8f88; margin-bottom:10px; }
+  .ig-deliverables { display:flex; gap:10px; flex-wrap:wrap; }
+  .ig-deliverable-chip { background:#fff; border:1px solid var(--gris-borde); border-radius:8px; padding:10px 16px; font-size:12.5px; color:#444; display:flex; align-items:center; gap:8px; }
+  .ig-deliverable-chip svg { color:var(--rojo); flex-shrink:0; }
+
+  /* Notas */
+  .ig-media-strip {
+    background:linear-gradient(135deg,var(--borgona),#2a0000);
+    border-radius:12px;
+    padding:20px 24px;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .ig-strip-left .strip-label { font-size:9px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:4px; }
+  .ig-strip-left .strip-count { font-family:'Montserrat',sans-serif; font-size:38px; font-weight:900; color:#fff; line-height:1; }
+  .ig-strip-left .strip-sub { font-size:11px; color:rgba(255,255,255,0.4); margin-top:3px; }
+  .ig-strip-right { display:flex; gap:20px; }
+  .ig-strip-stat { text-align:center; }
+  .ig-strip-stat .sv { font-family:'Montserrat',sans-serif; font-weight:900; font-size:18px; color:#fff; line-height:1; }
+  .ig-strip-stat .sl { font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.38); margin-top:3px; }
+
+  .ig-media-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; }
+  .ig-media-card { background:#fff; border-radius:12px; padding:20px; border:1px solid var(--gris-borde); text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:10px; transition:border-color .15s, transform .1s; }
+  .ig-media-card:hover { border-color:var(--rojo); transform:translateY(-2px); }
+  .ig-media-card-top { display:flex; align-items:center; justify-content:space-between; }
+  .ig-media-badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; padding:3px 9px; border-radius:5px; }
+  .ig-badge-tv    { background:#e8eefa; color:#1a3a9e; }
+  .ig-badge-radio { background:var(--pos-bg); color:var(--pos); }
+  .ig-badge-print { background:var(--neu-bg); color:var(--neu); }
+  .ig-badge-biz   { background:var(--neg-bg); color:var(--rojo); }
+  .ig-media-name { font-family:'Montserrat',sans-serif; font-size:15px; font-weight:900; color:var(--negro); line-height:1.2; }
+  .ig-media-desc { font-size:12.5px; color:#666; line-height:1.55; flex:1; }
+  .ig-media-cta { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid #f0eeec; }
+  .ig-media-cta-link { font-size:10px; font-weight:700; color:var(--rojo); letter-spacing:0.06em; text-transform:uppercase; }
+  .ig-media-arrow { width:14px; height:14px; color:var(--rojo); }
+
+  /* ─── FOOTER ─── */
+  .site-footer { background:var(--negro); padding:22px 48px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  .footer-text { font-size:11px; color:rgba(255,255,255,0.28); letter-spacing:0.03em; }
+  .footer-text strong { color:rgba(255,255,255,0.55); }
+
+  @media(max-width:768px) {
+    .top-bar, .main-tabs, .filtros-bar, .ns-main, .ig-hero, .ig-subnav, .ig-body, .site-footer { padding-left:20px; padding-right:20px; }
+    .kpi-strip { grid-template-columns:1fr 1fr; }
+    .kpi-card.principal { grid-column:1/-1; }
+    .charts-grid { grid-template-columns:1fr; }
+    .ig-tasks-grid { grid-template-columns:1fr; }
+    .ig-hero-right { align-items:flex-start; }
+    .comp-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─── -->
+<header class="top-bar">
+  <div class="top-logos">
+    <div class="logo-vc">
+      <div class="logo-vc-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M3 5L9 13L15 5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-vc-text">Vive Claro<span>Distrito Cultural</span></div>
+    </div>
+    <div class="logo-sep"></div>
+    <div class="logo-crop">CROP<span>Asuntos Públicos</span></div>
+  </div>
+  <div class="mes-badge">
+    <svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3" fill="white" opacity=".7"/></svg>
+    Junio 2026
+  </div>
+</header>
+
+<!-- ─── TABS PRINCIPALES ─── -->
+<nav class="main-tabs" role="tablist" aria-label="Módulos del informe">
+  <button class="main-tab active" role="tab" aria-selected="true"  onclick="showModule('ns', this)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Monitor de prensa · Net Sentiment
+  </button>
+  <button class="main-tab" role="tab" aria-selected="false" onclick="showModule('ig', this)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Informe de gestión
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     MÓDULO 1: NET SENTIMENT
+══════════════════════════════════════════ -->
+<div class="module visible" id="mod-ns">
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">Monitor de Prensa · Net Sentiment</div>
+      <div class="hero-titulo">OCESA &amp; <em>Vive Claro</em></div>
+      <div class="hero-sub">Monitoreo de medios · <span id="heroMes">Mayo 2026</span></div>
+      <div class="hero-kpis">
+        <div class="hero-kpi"><div class="hero-kpi-label">Total notas</div><div class="hero-kpi-valor" id="heroTotal">—</div></div>
+        <div class="hero-kpi"><div class="hero-kpi-label">Canal dominante</div><div class="hero-kpi-valor" id="heroDominante">—</div></div>
+        <div class="hero-kpi"><div class="hero-kpi-label">Período</div><div class="hero-kpi-valor" id="heroPeriodo">—</div></div>
+        <div class="hero-kpi"><div class="hero-kpi-label">Fuente</div><div class="hero-kpi-valor" id="heroFuente">Siglo Data</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filtros-bar">
+    <div class="filtros-label">Período</div>
+    <select class="filtro-select" id="filtroMesSelect" onchange="setMes(this.value)">
+      <option value="Abril 2026">Abril 2026</option>
+      <option value="Mayo 2026" selected>Mayo 2026</option>
+      <option value="Junio 2026">Junio 2026</option>
+    </select>
+    <div class="filtros-sep"></div>
+    <div class="filtros-label">Canal</div>
+    <div class="filtros-grupo" id="filtroCanal">
+      <button class="filtro-btn active" data-canal="Todos"    onclick="setCanal(this)">Todos</button>
+      <button class="filtro-btn" data-canal="Internet" onclick="setCanal(this)">Internet</button>
+      <button class="filtro-btn" data-canal="Prensa"   onclick="setCanal(this)">Prensa</button>
+      <button class="filtro-btn" data-canal="Radio"    onclick="setCanal(this)">Radio</button>
+      <button class="filtro-btn" data-canal="TV"       onclick="setCanal(this)">TV</button>
+    </div>
+    <div class="filtros-sep"></div>
+    <div class="filtros-label">Sentimiento</div>
+    <div class="filtros-grupo" id="filtroSent">
+      <button class="filtro-btn active" data-sent="Todos"    onclick="setSent(this)">Todos</button>
+      <button class="filtro-btn" data-sent="Positivo" onclick="setSent(this)">Positivo</button>
+      <button class="filtro-btn" data-sent="Negativo" onclick="setSent(this)">Negativo</button>
+      <button class="filtro-btn" data-sent="Neutro"   onclick="setSent(this)">Neutro</button>
+    </div>
+    <div class="resultados-count"><strong id="countActivo">—</strong> notas</div>
+  </div>
+
+  <main class="ns-main">
+    <div class="kpi-strip">
+      <div class="kpi-card principal">
+        <div>
+          <div class="kpi-eyebrow">Net Sentiment</div>
+          <span class="kpi-num" id="kpiNetSent">—</span>
+          <div class="kpi-desc">(Positivas − Negativas) / Total</div>
+        </div>
+        <div id="kpiNetComp" style="margin-top:10px;"></div>
+      </div>
+      <div class="kpi-card"><div class="kpi-eyebrow">Total notas</div><span class="kpi-num" id="kpiTotal">—</span><div class="kpi-desc">publicaciones</div></div>
+      <div class="kpi-card"><div class="kpi-eyebrow">Positivas</div><span class="kpi-num pos" id="kpiPos">—</span><div class="kpi-desc" id="kpiPosPct">—</div></div>
+      <div class="kpi-card"><div class="kpi-eyebrow">Negativas</div><span class="kpi-num neg" id="kpiNeg">—</span><div class="kpi-desc" id="kpiNegPct">—</div></div>
+      <div class="kpi-card"><div class="kpi-eyebrow">Neutras</div><span class="kpi-num neu" id="kpiNeu">—</span><div class="kpi-desc" id="kpiNeuPct">—</div></div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card full">
+        <div class="chart-titulo">Tendencia diaria por sentimiento</div>
+        <div class="chart-area tall"><canvas id="chartTendencia"></canvas></div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#2d8a5e"></div>Positivo</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#c42e20"></div>Negativo</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#8a6d00"></div>Neutro</div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-titulo">Distribución por sentimiento</div>
+        <div class="chart-area"><canvas id="chartSentimiento"></canvas></div>
+        <div class="chart-legend" id="legendSent"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-titulo">Distribución por canal</div>
+        <div class="chart-area"><canvas id="chartCanal"></canvas></div>
+        <div class="chart-legend" id="legendCanal"></div>
+      </div>
+    </div>
+
+    <div class="comp-card" id="compCard">
+      <div class="comp-titulo" id="compTitulo">Comparativa mensual · Abril vs. Mayo 2026</div>
+      <div class="comp-grid" id="compGrid"></div>
+    </div>
+
+    <div class="ranking-card">
+      <div class="ranking-header"><div class="ranking-titulo">Ranking de medios · más activos</div></div>
+      <div class="ranking-body" id="rankingBody"></div>
+    </div>
+
+    <div class="tabla-card">
+      <div class="tabla-header">
+        <div class="tabla-titulo">Notas detalladas</div>
+        <input type="text" class="search-input" placeholder="Buscar nota o medio…" id="searchInput" oninput="render()">
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Medio</th><th>Canal</th><th>Titular</th><th>Sentimiento</th></tr></thead>
+          <tbody id="tablaBody"></tbody>
+        </table>
+        <div class="tabla-empty" id="tablaEmpty" style="display:none">No hay notas que coincidan con los filtros.</div>
+      </div>
+    </div>
+  </main>
+
+</div><!-- /mod-ns -->
+
+
+<!-- ══════════════════════════════════════════
+     MÓDULO 2: INFORME DE GESTIÓN
+══════════════════════════════════════════ -->
+<div class="module" id="mod-ig">
+
+  <div class="ig-hero">
+    <div class="ig-hero-inner">
+      <div class="ig-hero-left">
+        <div class="ig-eyebrow">CROP Asuntos Públicos · Cliente OCESA / Vive Claro</div>
+        <div class="ig-titulo">Informe de <em>gestión</em></div>
+        <div class="ig-sub">Resumen ejecutivo de actividades y resultados del período</div>
+      </div>
+      <div class="ig-hero-right">
+        <select class="ig-mes-select" id="igMesSelect" onchange="setIgMes(this.value)">
+          <option value="Mayo 2026" selected>Mayo 2026</option>
+          <option value="Junio 2026">Junio 2026</option>
+        </select>
+        <div class="ig-hero-stats">
+          <div class="ig-hero-stat"><div class="stat-val" id="igStatNotas">—</div><div class="stat-label">Notas en medios</div></div>
+          <div class="ig-hero-stat"><div class="stat-val" id="igStatObjetivos">—</div><div class="stat-label">Objetivos</div></div>
+          <div class="ig-hero-stat"><div class="stat-val" id="igStatEntregables">—</div><div class="stat-label">Entregables</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="ig-subnav" role="tablist" aria-label="Secciones del informe">
+    <button class="ig-tab active" role="tab" onclick="showIgSec('obj',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      Objetivos
+    </button>
+    <button class="ig-tab" role="tab" onclick="showIgSec('est',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      Estrategia
+    </button>
+    <button class="ig-tab" role="tab" onclick="showIgSec('tar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tareas
+    </button>
+    <button class="ig-tab" role="tab" onclick="showIgSec('not',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg>
+      Notas destacadas
+    </button>
+  </nav>
+
+  <div class="ig-body">
+
+    <!-- Objetivos -->
+    <div class="ig-section visible" id="ig-sec-obj">
+      <div class="ig-section-eyebrow" id="igSecEyebrowObj">Periodo Mayo 2026</div>
+      <div class="ig-section-heading">Objetivos del periodo</div>
+      <div class="ig-obj-grid" id="igObjGrid"></div>
+    </div>
+
+    <!-- Estrategia -->
+    <div class="ig-section" id="ig-sec-est">
+      <div class="ig-section-eyebrow">Acciones ejecutadas</div>
+      <div class="ig-section-heading">Estrategia ejecutada</div>
+      <div class="ig-strategy-list" id="igStrategyList"></div>
+    </div>
+
+    <!-- Tareas -->
+    <div class="ig-section" id="ig-sec-tar">
+      <div class="ig-section-eyebrow">Resumen de actividades</div>
+      <div class="ig-section-heading">Principales tareas realizadas</div>
+      <div class="ig-tasks-grid" id="igTasksGrid"></div>
+      <div class="ig-deliv-label">Entregables del periodo</div>
+      <div class="ig-deliverables" id="igDeliverables"></div>
+    </div>
+
+    <!-- Notas -->
+    <div class="ig-section" id="ig-sec-not">
+      <div class="ig-section-eyebrow">Resultados en medios</div>
+      <div class="ig-section-heading">Notas destacadas</div>
+      <div class="ig-media-strip">
+        <div class="ig-strip-left">
+          <div class="strip-label">Impactos conseguidos</div>
+          <div class="strip-count" id="igStripCount">—</div>
+          <div class="strip-sub" id="igStripSub">notas en medios</div>
+        </div>
+        <div class="ig-strip-right" id="igStripStats"></div>
+      </div>
+      <div class="ig-media-grid" id="igMediaGrid"></div>
+    </div>
+
+  </div>
+</div><!-- /mod-ig -->
+
+<!-- ─── FOOTER ─── -->
+<footer class="site-footer">
+  <div class="footer-text"><strong>CROP Asuntos Públicos</strong> · Monitor de medios y gestión OCESA / Vive Claro</div>
+  <div class="footer-text">Fuente: <strong id="footerFuente">Siglo Data</strong> · <span id="footerFecha"></span></div>
+</footer>
+
+<script>
+// ══════════════════════════════════════════
+// NAVEGACIÓN PRINCIPAL
+// ══════════════════════════════════════════
+function showModule(id, btn) {
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('visible'));
+  document.querySelectorAll('.main-tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  document.getElementById('mod-' + id).classList.add('visible');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showIgSec(id, btn) {
+  document.querySelectorAll('.ig-section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.ig-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('ig-sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// DATOS NET SENTIMENT
+// ══════════════════════════════════════════
+const DATOS = {
+  "Abril 2026": [{"fecha":"01/04/2026","medio":"fucsia.co","titular":"BTS confirmó fechas y recintos de su gira mundial 'ARIRANG' en Latinoamérica","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"04/04/2026","medio":"revistawhatsup.com","titular":"BTS revela los venues y detalles de venta para las fechas en Colombia y América Latina de la gira mundial 'ARIRANG'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"04/04/2026","medio":"Blu Radio","titular":"La industria del entretenimiento está en expansión en Colombia","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"04/04/2026","medio":"fullmagazinenoticias.blogspot.com","titular":"BTS revela los venues y detalles de venta para las fechas en Colombia y América Latina","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"06/04/2026","medio":"mixnewscolombia.com","titular":"BTS REVELA LOS VENUES Y DETALLES DE VENTA PARA LAS FECHAS EN COLOMBIA","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/04/2026","medio":"elenfoquecolombia.com","titular":"Emyl Rusev será el artista invitado para abrir el concierto de Ed Sheeran","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"08/04/2026","medio":"Noticiascaracol.com","titular":"Ed Sheeran en Bogotá: anuncian importante cambio para los asistentes al concierto en Vive Claro","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"09/04/2026","medio":"bolivarense.com","titular":"Concierto de Ed Sheeran en Bogotá tendrá cambio clave: nuevas sillas en platea y precios actualizados","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"09/04/2026","medio":"quenube.com","titular":"Un jurado está a punto de decidir el destino de Ticketmaster","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"09/04/2026","medio":"semana.com","titular":"Carrusel de conciertos en rock y electrónica a no perderse en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/04/2026","medio":"bogota.gov.co","titular":"Conoce la agenda de conciertos en Bogotá de abril a diciembre de 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"13/04/2026","medio":"asuntoslegales.com.co","titular":"Ticketmaster: el costo de una vigilancia tardía","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"13/04/2026","medio":"bacatastereo.com","titular":"Bogotá vibra con agenda musical","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"13/04/2026","medio":"periodicolatribuna.com","titular":"Bogotá se llena de conciertos en 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/04/2026","medio":"radiosantafe.com","titular":"Conozca la agenda de conciertos en Bogotá de abril a diciembre de 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/04/2026","medio":"Canal Caracol","titular":"Monopolio ilegal para Live Nation en Estados Unidos","soporte":"TV","sentimiento":"Negativo"},{"fecha":"15/04/2026","medio":"caracol.com.co","titular":"Un jurado determina que Live Nation y Ticketmaster mantenían un monopolio ilegal de venta de boletas","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"15/04/2026","medio":"lainfoguia.com","titular":"Un jurado federal determina que el negocio de conciertos Live Nation es un monopolio","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"15/04/2026","medio":"larepublica.co","titular":"Jurado de EE.UU. dictaminó que Live Nation monopolizó ilegalmente eventos en vivo","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"15/04/2026","medio":"quenube.com","titular":"Espera, ¿todavía podrían separar Live Nation?","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"16/04/2026","medio":"Caracol Radio Bogotá","titular":"Live Nation y Ticketmaster declaradas monopolio ilegal: ¿qué pasa con el Monumental?","soporte":"Radio","sentimiento":"Negativo"},{"fecha":"16/04/2026","medio":"es.rollingstone.com","titular":"Un jurado en Estados Unidos determina que Live Nation operó como un monopolio","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"16/04/2026","medio":"forbes.co","titular":"Acciones de Live Nation caen después de que un jurado dictaminara que operaba un monopolio","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"16/04/2026","medio":"lafm.com.co","titular":"Justicia de EE.UU. determina que Live Nation y Ticketmaster ostentaron un monopolio ilegal","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"16/04/2026","medio":"portafolio.co","titular":"Fallo contra Live Nation y Ticketmaster sacude el negocio de conciertos","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"16/04/2026","medio":"Publimetro Bogotá","titular":"Ed Sheeran – Anuncio","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"16/04/2026","medio":"quenube.com","titular":"Ticketmaster es un monopolio ilegal, según el jurado","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"17/04/2026","medio":"lanacion.com.co","titular":"¿Quién manda realmente en el espectáculo?","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"17/04/2026","medio":"quenube.com","titular":"Live Nation dice que luchará contra la pérdida de la demanda por monopolio","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"19/04/2026","medio":"El Tiempo","titular":"Ed Sheeran – Anuncio","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"20/04/2026","medio":"las2orillas.co","titular":"Con 6 meses de anticipación Cielo Rusinque tiene a raya a los 2 organizadores del concierto BTS","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"23/04/2026","medio":"Canal RCN","titular":"Cumbre de economía circular en Tolima · Luz Rey, Vive Claro","soporte":"TV","sentimiento":"Positivo"},{"fecha":"23/04/2026","medio":"Caracol Radio Bogotá","titular":"Hoy es el día de la cerveza en Alemania - BBC - Vive Claro","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"23/04/2026","medio":"elespectador.com","titular":"El urbanismo imposible","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/04/2026","medio":"es.rollingstone.com","titular":"Ame Concerts: la experiencia como lenguaje y el futuro expandido de los conciertos en América Latina","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"28/04/2026","medio":"Caracol Radio Bogotá","titular":"Bogotá tendría una nueva arena para más de 20 mil personas - Vive Claro","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"29/04/2026","medio":"Noticiascaracol.com","titular":"Ed Sheeran revela problema de salud previo a su concierto en Bogotá","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"30/04/2026","medio":"bolivarense.com","titular":"Ed Sheeran revela problema de salud y confirma concierto en Bogotá con su Loop Tour","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"13/04/2026","medio":"La República","titular":"Ticketmaster: el costo de una vigilancia tardía","soporte":"Prensa","sentimiento":"Negativo"},{"fecha":"17/04/2026","medio":"ADN Bogotá","titular":"Ticketmaster, culpable de monopolio en EE. UU","soporte":"Prensa","sentimiento":"Negativo"},{"fecha":"17/04/2026","medio":"La Nación","titular":"¿Quién manda realmente en el espectáculo?","soporte":"Prensa","sentimiento":"Negativo"},{"fecha":"23/04/2026","medio":"El Espectador","titular":"El urbanismo imposible","soporte":"Prensa","sentimiento":"Positivo"}],
+  "Mayo 2026": [{"fecha":"01/05/2026","medio":"technocio.com","titular":"Blessd, Pipe Bueno y Aria Vega, el cartel que integra música, fútbol y celebración en el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"02/05/2026","medio":"portalgeek.co","titular":"Claro Fútbol Fest Bogotá 2026: Blessd, Pipe Bueno y Récord Guinness en un solo lugar","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"04/05/2026","medio":"Canal Red Mas","titular":"Un Café Claro · Claro Futbol Fest en Vive Claro","soporte":"TV","sentimiento":"Positivo"},{"fecha":"04/05/2026","medio":"tecnogus.com.co","titular":"Blessd, Pipe Bueno y Aria Vega, el cartel que integra música, fútbol y celebración en el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"05/05/2026","medio":"lafm.com.co","titular":"Ed Sheeran en Bogotá: fanáticos son sorprendidos con importante cambio para el concierto","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"05/05/2026","medio":"zonacaptiva.com","titular":"Blessd, Pipe Bueno y Aria Vega encabezan el innovador Claro Fútbol Fest en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"05/05/2026","medio":"eltiempo.com","titular":"Claro Fútbol Fest reunirá la música y la pasión deportiva en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"05/05/2026","medio":"mixnewscolombia.com","titular":"BLESSD, PIPE BUENO Y ARIA VEGA, EL CARTEL QUE INTEGRA MÚSICA, FÚTBOL Y CELEBRACIÓN EN EL CLARO FÚTBOL FEST","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"06/05/2026","medio":"acis.org.co","titular":"Blessd, Pipe Bueno y Aria Vega, el cartel que integra música, fútbol y celebración en el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"06/05/2026","medio":"clarosports.com","titular":"Blessd, Pipe Bueno y Aria Vega, el cartel que integra música, fútbol y celebración en el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/05/2026","medio":"noticiasrcn.com","titular":"El partido de la Selección Colombia vs. Portugal se transmitirá en el Vive Claro","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/05/2026","medio":"caracol.com.co","titular":"Bless, Pipe Bueno y Aria Vega se unen en torno a la pasión por el fútbol","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/05/2026","medio":"caracol.com.co","titular":"Vive Claro enciende la fiesta del fútbol con Blessd, Pipe Bueno y Aria Vega","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/05/2026","medio":"eltiempo.com","titular":"Vive Claro alista jornada masiva con fútbol, música en vivo y transmisión de Colombia vs. Portugal","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/05/2026","medio":"marieclairecolombia.com","titular":"¿Dónde comprar boletas para Ed Sheeran en Bogotá? Precios y fecha del concierto","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/05/2026","medio":"Noticiascaracol.com","titular":"Partido Colombia vs. Portugal se transmitirá en vivo en Bogotá con show de Blessd y más","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"08/05/2026","medio":"bluradio.com","titular":"Fans de Blessd podrán ver el partido Colombia vs. Portugal con él","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"08/05/2026","medio":"forbes.co","titular":"Mujeres poderosas 2026 | Luz Ángela Castro","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"09/05/2026","medio":"REVISTA FORBES","titular":"Luz Ángela Castro","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"09/05/2026","medio":"lafmplus.com","titular":"Ed Sheeran llega a Bogotá: una noche inolvidable este sábado 16 de mayo","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"09/05/2026","medio":"larepublica.co","titular":"Revolcón en negocio de los conciertos con posible nuevo escenario de Live Nation","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"09/05/2026","medio":"La República","titular":"Revolcón en los conciertos con posible movida de Live Nation","soporte":"Prensa","sentimiento":"Negativo"},{"fecha":"09/05/2026","medio":"redexpertos.co","titular":"Este es el cartel que integra música, fútbol y celebración en el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/05/2026","medio":"eltiempo.com","titular":"Bogotá se alista para el Loop Tour: TransMilenio y Sitp anuncian plan de movilidad para Ed Sheeran","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/05/2026","medio":"La FM Radio","titular":"Aria Vega, Bless y Pipe Bueno se presentaran en el Vive Claro para el Claro Football Fest","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"12/05/2026","medio":"las2orillas.co","titular":"La dueña de Ticketmaster y Ocesa tendría listo un nuevo proyecto para revolucionar los conciertos en Bogotá","soporte":"Internet","sentimiento":"Negativo"},{"fecha":"12/05/2026","medio":"La FM Radio","titular":"Concierto especial en el Vive Claro // Warner Music","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"13/05/2026","medio":"alo.co","titular":"Vive Claro se prepara para vivir el fútbol como nunca: música, fiesta y celebración multitudinaria","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"13/05/2026","medio":"copu.media","titular":"¿Listo para el partido contra Portugal? Vive Claro presenta el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"13/05/2026","medio":"El Tiempo","titular":"El concierto de Ed Sheeran","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"13/05/2026","medio":"Fuego Stereo","titular":"Bogotá oficializó la quinta arena de eventos","soporte":"Radio","sentimiento":"Neutro"},{"fecha":"14/05/2026","medio":"portafolio.co","titular":"Tras dos años en Colombia, JetSMART firma alianza permanente con Vive Claro Distrito Cultural","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"aeroermo.com","titular":"JetSMART se convierte en la aerolínea oficial de Vive Claro Distrito Cultural","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"bluradio.com","titular":"Concierto de Ed Sheeran en Bogotá: TransMilenio sí operará el sábado con estas rutas","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"diariodelcauca.com.co","titular":"Ed Sheeran cada vez más cerca de cantar en Colombia después de 9 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"economiaydesarrollo.com","titular":"JetSMART se convierte en la aerolínea oficial de Vive Claro Distrito Cultural","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"elperiodicodeportivo.com.co","titular":"Ed Sheeran cada vez más cerca de cantar en Colombia después de 9 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"extra.com.co","titular":"Ed Sheeran cada vez más cerca de cantar en Colombia después de 9 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"hsbnoticias.com","titular":"Ed Sheeran cada vez más cerca de cantar en Colombia después de 9 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"14/05/2026","medio":"impactamag.com","titular":"TransMilenio activa operación especial para 2 conciertos masivos este fin de semana en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"La FM Radio","titular":"Recomendaciones musicales para el fin de semana // Conciertos en Bogotá","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"Canal RCN","titular":"Daddy Yankee de sorpresa con Ed Sheeran en Puerto Rico. (men. Vive Claro)","soporte":"TV","sentimiento":"Neutro"},{"fecha":"15/05/2026","medio":"Canal RCN","titular":"Daddy Yankee en concierto de Ed Sheeran. (men. Vive Claro Telecomunicaciones)","soporte":"TV","sentimiento":"Neutro"},{"fecha":"15/05/2026","medio":"areacucuta.com","titular":"Prepárate para cantar con Ed Sheeran: Claro música lanza la playlist definitiva","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"bluradio.com","titular":"Romeo Santos Bogotá: precios y localidades para concierto con Prince Royce en Vive Claro","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"bogota.gov.co","titular":"Rutas de TransMilenio para llegar o salir del concierto de Ed Sheeran en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"caracol.com.co","titular":"El Rey y el Príncipe de la bachata, Romeo Santos y Prince Royce confirman concierto en Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"caracol.com.co","titular":"Concierto de Ed Sheeran en Bogotá: Horarios, rutas de llegada, salida y posible setlist","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"economistacolombia.com","titular":"Tras dos años en Colombia, JetSMART firma alianza permanente con Vive Claro Distrito Cultural","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"elespectador.com","titular":"Fin de semana de conciertos, partido y más en Bogotá: estos son los planes de movilidad","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"elespectador.com","titular":"Romeo Santos y Prince Royce llegan a Colombia con su gira en pareja: fecha, lugar y precios","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"elheraldo.co","titular":"Romeo Santos y Prince Royce llegan a Colombia con su gira 'Mejor Tarde Que Nunca Tour 2026'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"eltiempo.com","titular":"Qué hacer en Bogotá durante este puente","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"15/05/2026","medio":"eltiempo.com","titular":"Romeo Santos y Prince Royce llegarán a Bogotá el próximo 2 de octubre","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"kienyke.com","titular":"Romeo Santos y Prince Royce en Bogotá 2026: fecha, preventa y boletería","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"La FM Radio","titular":"Ed Sheeran, Silvestre Dangond y Natalia Lafourcade se presentarán en Colombia","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"lanotaeconomica.com.co","titular":"JetSMART se convierte en la aerolínea oficial de Vive Claro Distrito Cultural","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"noticiasbq.com","titular":"Romeo Santos y Prince Royce confirman concierto en Colombia para octubre de 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"Noticiascaracol.com","titular":"Romeo Santos y Prince Royce llegarán a Bogotá con su histórica gira conjunta","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"noticiasrcn.com","titular":"Romeo Santos y Prince Royce llegarán a Bogotá con su gira 'Mejor Tarde que Nunca Tour'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"publimetro.co","titular":"Una noche para cantar con tusa: Romeo Santos y Prince Royce llegarán juntos a Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"semana.com","titular":"Dos gigantes de la bachata aterrizan en Bogotá: Romeo Santos y Prince Royce al Vive Claro","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"technocio.com","titular":"JetSMART aterriza en Vive Claro Distrito Cultural como aerolínea oficial del entretenimiento en Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/05/2026","medio":"technocio.com","titular":"Prepárate para cantar las canciones de Ed Sheeran con la playlist de Claro música","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"radiosantafe.com","titular":"Rutas de TransMilenio para llegar o salir del concierto de Ed Sheeran este sábado","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"Canal RCN","titular":"Hoy se presenta el artista Ed Sheeran en el Vive Claro de Bogotá","soporte":"TV","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"Canal RCN","titular":"Esta noche es el gran concierto de Ed Sheeran en el Vive Claro de Bogotá","soporte":"TV","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"Canal Caracol","titular":"Esta noche concierto de Ed Sheeran en el Vive Claro de Bogotá","soporte":"TV","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"colombia.com","titular":"Conciertos en Bogotá: Ed Sheeran y Nelson Velásquez se presentarán hoy","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"cucutaaldia.co","titular":"Prepárate para cantar con Ed Sheeran: Claro Música lanza la playlist final","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"elcolombiano.com","titular":"Todo listo para el concierto de Ed Sheeran en Bogotá: horarios, rutas y posible setlist","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"elespectador.com","titular":"Concierto de Ed Sheeran en Bogotá: horarios, setlist, qué no llevar y recomendaciones","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"El Tiempo","titular":"Los planes para este fin de semana","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"16/05/2026","medio":"ifmnoticias.com","titular":"Bogotá tendrá conciertos, ferias gastronómicas, teatro y actividades culturales durante el puente","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"16/05/2026","medio":"lafm.com.co","titular":"Ed Sheeran en Bogotá: ¿Quién es el artista colombo-búlgaro que abrirá el concierto?","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"larepublica.co","titular":"El esperado regreso de Ed Sheeran","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"La República","titular":"El esperado regreso de Ed Sheeran","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"semana.com","titular":"¿Va al concierto de Ed Sheeran este sábado? Estas son las rutas de TransMilenio habilitadas","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"semana.com","titular":"Ed. 2286 - Semana","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"Canal Caracol","titular":"Agenda de conciertos musicales en Bogotá (Mención Vive Claro - Movistar Arena)","soporte":"TV","sentimiento":"Positivo"},{"fecha":"16/05/2026","medio":"eltiempo.com","titular":"Así fue el concierto acústico de Ed Sheeran en el escenario Vive Claro de Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"eje21.com.co","titular":"Ed Sheeran guía a Bogotá por los mayores éxitos de su carrera con un concierto acústico","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"elespectador.com","titular":"Ed Sheeran en Bogotá: una lluvia amable para una noche de nostalgia, clásicos y euforia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"Canal RCN","titular":"Concierto del cantante Ed Sheeran en el Vive Claro Bogotá","soporte":"TV","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"elheraldo.co","titular":"Ed Sheeran guía a Bogotá por los mayores éxitos de su carrera con un concierto acústico","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"eltiempo.com","titular":"Ed Sheeran se convierte en el hombre orquesta en su Loop Tour: así conquistó Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"colombia.com","titular":"Ed Sheeran emocionó a Bogotá con un concierto íntimo y lleno de sorpresas","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"cronicadelquindio.com","titular":"Ed Sheeran emocionó a Bogotá con su concierto del Loop Tour","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"lapatria.com","titular":"Ed Sheeran en Colombia: el cantante británico conquistó a cerca de 40 mil fanáticos","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/05/2026","medio":"zonacero.com","titular":"Ed Sheeran conquistó Bogotá con un show íntimo y lleno de éxitos","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"18/05/2026","medio":"El Tiempo","titular":"Ed Sheeran se vuelve hombre orquesta en su Loop Tour","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"18/05/2026","medio":"farandula.co","titular":"Romeo Santos y Prince Royce llegan con su gira 'Mejor Tarde Que Nunca Tour 2026' al Vive Claro","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"18/05/2026","medio":"La FM Radio","titular":"El Claro Fútbol Fest reunirá a más de 45.000 aficionados en el Vive Claro el 27 de junio","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"18/05/2026","medio":"acis.org.co","titular":"Prepárate para cantar las canciones de Ed Sheeran con la playlist de Claro música","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"19/05/2026","medio":"canaltrece.com.co","titular":"Romeo Santos Prince Royce Bogotá confirma concierto en 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"19/05/2026","medio":"portalgeek.co","titular":"¡Romeo Santos y Prince Royce en Bogotá! Cómo conseguir tus boletas en preventa exclusiva con Claro club","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"19/05/2026","medio":"redmas.com.co","titular":"Claro club lo lleva a ver a Romeo Santos y Prince Royce","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"19/05/2026","medio":"Caracol Radio Bogotá","titular":"Concierto de Silvestre Dangond // Concierto de Ed Sheeran en Vive Claro","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"19/05/2026","medio":"technocio.com","titular":"Con Claro club accede a la boletería de Romeo Santos y Prince Royce en preventa","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"20/05/2026","medio":"acis.org.co","titular":"Con Claro club accede a la boletería de Romeo Santos y Prince Royce en preventa","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"20/05/2026","medio":"canaltrece.com.co","titular":"Festivales y grandes conciertos en Colombia: La agenda imperdible para el segundo semestre de 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"20/05/2026","medio":"latamfintech.co","titular":"Únete a la comunidad de Fintech más activa de Latam","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"20/05/2026","medio":"tecnogus.com.co","titular":"Con Claro club accede a la boletería de Romeo Santos y Prince Royce en preventa","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"20/05/2026","medio":"Telecafé","titular":"Ed Sheeran enamoró a la capital colombiana en el Vive Claro, como parte de su exitosa gira, el Loop Tour","soporte":"TV","sentimiento":"Positivo"},{"fecha":"21/05/2026","medio":"elperiodicodeportivo.com.co","titular":"Así estuvo el concierto de Ed Sheeran en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"21/05/2026","medio":"extra.com.co","titular":"Así estuvo el concierto de Ed Sheeran en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"21/05/2026","medio":"hsbnoticias.com","titular":"Así estuvo el concierto de Ed Sheeran en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"21/05/2026","medio":"lafm.com.co","titular":"Blessd, Pipe Bueno y Aria Vega animarán la fiesta del partido Colombia vs. Portugal en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"21/05/2026","medio":"diariodelcauca.com.co","titular":"Así estuvo el concierto de Ed Sheeran en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"Noticiascaracol.com","titular":"Stray Kids anuncia su primer concierto en Colombia: fecha, lugar y precios de las entradas","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"bluradio.com","titular":"Stray Kids llega a Bogotá y reafirma la importancia del K-Pop en Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"elespectador.com","titular":"Stray Kids en Bogotá: fecha, lugar, precios y más sobre el concierto de la banda de K-pop","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"elheraldo.co","titular":"El grupo de K-Pop 'Stray Kids' anuncia concierto en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"estilodigital.com.co","titular":"JetSMART, aerolínea oficial de Vive Claro Distrito Cultural","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"garrapatudo.com","titular":"Sin Ausencia apuesta por el storytelling musical en 'Nunca Pude Odiarte'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"grandeslanzamientos.com.co","titular":"Sin Ausencia apuesta por el storytelling musical en 'Nunca Pude Odiarte'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"portafolio.co","titular":"Stand permanente y sorteos de boletas: así opera la alianza de JetSMART con Vive Claro en cada concierto","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"eje21.com.co","titular":"El k-pop del surcoreano Stray Kids llegará por primera vez a Colombia el 9 de septiembre","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"22/05/2026","medio":"Telecaribe","titular":"La bachata vuelve a Colombia: Romeo Santos y Prince Royce confirman regreso al país, Bogotá 2 de octubre en Vive Claro","soporte":"TV","sentimiento":"Neutro"},{"fecha":"23/05/2026","medio":"lapatria.com","titular":"El k-pop surcoreano llega a Colombia: la banda Stray Kids estará en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"23/05/2026","medio":"AL DIA BARRANQUILLA","titular":"El grupo de K-Pop 'Stray Kids' anuncia concierto en Colombia","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"24/05/2026","medio":"La FM Radio","titular":"El Escenario Vive Claro transmitirá el 27 de junio la transmisión del partido de Colombia con artistas","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"24/05/2026","medio":"farandula.co","titular":"Stray Kids anuncia su serie especial de shows en Latinoamérica 'Straycity'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/05/2026","medio":"revistaclevel.com","titular":"Bogotá acelera la carrera por convertirse en capital del entretenimiento en América Latina","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/05/2026","medio":"zonacaptiva.com","titular":"JetSMART oficializa alianza como aerolínea exclusiva de Vive Claro Distrito Cultural","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/05/2026","medio":"Señal Colombia TV","titular":"Comunidades vecinas del Centro de Eventos Vive Claro expresaron ante el Congreso su malestar por ruido, movilidad y espacio público","soporte":"TV","sentimiento":"Negativo"},{"fecha":"25/05/2026","medio":"los40.com.co","titular":"La banda de K-pop Stray Kids llega por primera vez a Colombia. Lugar y precios","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/05/2026","medio":"garrapatudo.com","titular":"LA FERIA MÁS IMPORTANTE DE LA INDUSTRIA LICORERA REGRESA A BOGOTÁ: EXPOLICORES 2026 LLEGA AL PABELLÓN VIVE CLARO","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/05/2026","medio":"inspirayconecta.blogspot.com","titular":"Stray Kids anuncia su serie especial de shows en Latinoamérica 'Straycity'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/05/2026","medio":"kienyke.com","titular":"Stray Kids en Colombia 2026: todo lo que debe saber del concierto en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/05/2026","medio":"garrapatudo.com","titular":"Junio, un mes que da la bienvenida a la cultura del entretenimiento, el orgullo y fútbol colombiano","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/05/2026","medio":"noticiassuper.com","titular":"Junio, un mes que da la bienvenida a la cultura del entretenimiento, el orgullo y fútbol colombiano","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/05/2026","medio":"portalgeek.co","titular":"Junio 2026 en Bogotá: Entretenimiento, Comic Con, Mundial de Fútbol y Conciertos","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/05/2026","medio":"dxtcapital.com","titular":"JUNIO, UN MES QUE DA LA BIENVENIDA A LA CULTURA DEL ENTRETENIMIENTO, EL ORGULLO Y FÚTBOL COLOMBIANO","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/05/2026","medio":"Caracol Radio Bogotá","titular":"Termómetro ruta mundial (Vive Claro)","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"27/05/2026","medio":"estilodigital.com.co","titular":"Campaña 'Descubre la Diversidad de Colombia' gana reconocimiento","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"28/05/2026","medio":"es.rollingstone.com","titular":"Conozca la agenda del Vive Claro que pondrá a vibrar a Bogotá en 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"28/05/2026","medio":"Caracol Radio Bogotá","titular":"El Termómetro de la Ruta Mundial: ¿Hasta dónde llegará la Selección Colombia? (men. Vive Claro / Claro Futbol Fest)","soporte":"Radio","sentimiento":"Neutro"},{"fecha":"28/05/2026","medio":"eltiempo.com","titular":"Junio, un mes que da la bienvenida a la cultura del entretenimiento, el orgullo y fútbol colombiano","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"29/05/2026","medio":"radioacktiva.com","titular":"Confirman concierto de Slayer en el Vive Claro de Bogotá: fecha y precio de las boletas","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"29/05/2026","medio":"lafm.com.co","titular":"Después de nueve años, Slayer vuelve a Colombia: detalles de la boletería, localidades y escenario","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"29/05/2026","medio":"eltiempo.com","titular":"La legendaria banda de metal Slayer anuncia su regreso a Colombia después de nueve años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"29/05/2026","medio":"Infobae","titular":"Slayer anunció su regreso a Colombia para celebrar 40 años de su obra maestra","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"29/05/2026","medio":"larepublica.co","titular":"JetSmart realizó alianza con Vive Claro para desarrollo de eventos en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"30/05/2026","medio":"elespectador.com","titular":"Slayer en Bogotá: fecha, lugar, precio de las boletas y más","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"30/05/2026","medio":"La República","titular":"JetSmart será la aerolínea de Vive Claro","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"31/05/2026","medio":"inspirayconecta.blogspot.com","titular":"Junio, un mes que da la bienvenida a la cultura del entretenimiento, el orgullo y fútbol colombiano","soporte":"Internet","sentimiento":"Neutro"}],
+  "Junio 2026": [{"fecha":"01/06/2026","medio":"elirreverenteibague.com","titular":"Tapa Roja hace su apuesta en Expolicores para convertirse en la bebida de los colombianos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"01/06/2026","medio":"elfrente.com.co","titular":"Slayer regresa a Colombia para celebrar los 40 años de 'Reign In Blood'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"01/06/2026","medio":"ADN Medellín","titular":"CARTELERA 2026","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"01/06/2026","medio":"ADN Barranquilla","titular":"CARTELERA 2026","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"01/06/2026","medio":"ADN Bogotá","titular":"CARTELERA 2026","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"01/06/2026","medio":"revistadc.com","titular":"Más de 40 cervecerías y música en vivo en Bandas, Pola y Parrilla 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"01/06/2026","medio":"revistadc.com","titular":"Blessd, Pipe Bueno y Aria Vega le ponen ritmo a Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"01/06/2026","medio":"revistadc.com","titular":"Cuatro décadas de Reign in Blood: Slayer anuncia su regreso a Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"lescuentoque.com.co","titular":"Comic Con Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"ecosdelcombeima.com","titular":"Tapa Roja hace su apuesta en Expolicores para convertirse en la bebida de los colombianos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"tolimastereo.com","titular":"Tapa Roja hace su apuesta en Expolicores para convertirse en la bebida de los colombianos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"radioacktiva.com","titular":"Def Leppard, Fito Páez, Slayer y más: Conciertos imperdibles en Colombia lo que queda de 2026","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"laotraverdad.co","titular":"Tapa Roja busca conquistar nuevos mercados en la principal feria licorera de Colombia","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"elcronista.co","titular":"Tapa Roja hace su apuesta en Expolicores para convertirse en la bebida de los colombianos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"Caracol Radio","titular":"El Movistar Arena de Bogotá se consolida como líder mundial en escenarios de entretenimiento","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"La W","titular":"Diversidad de conciertos y eventos musicales marcarán la agenda de junio","soporte":"Radio","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"Caracol Radio","titular":"El Claro fútbol Fest en el Vive claro","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"ADN Medellín","titular":"EL METAL DE SLAYER VENDRÁ A BOGOTÁ","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"ADN Bogotá","titular":"EL METAL DE SLAYER VENDRÁ A BOGOTÁ","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"ADN Barranquilla","titular":"EL METAL DE SLAYER VENDRÁ A BOGOTÁ","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"ciudadyregion.com.co","titular":"Tapa Roja hace su apuesta en Expolicores para convertirse en la bebida de los colombianos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"elnuevodia.com.co","titular":"Tapa Roja está en Expolicores: busca seguir creciendo a nivel nacional","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"technocio.com","titular":"Accede a la preventa de Slayer con Claro Club","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"02/06/2026","medio":"vozdelpueblo920am.com","titular":"Tapa Roja hace su apuesta en Expolicores para convertirse en la bebida de los colombianos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"02/06/2026","medio":"impactamag.com","titular":"Claro Club habilita la preventa exclusiva de boletería para el concierto de Slayer en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"03/06/2026","medio":"publimetro.co","titular":"Eventos masivos en Colombia alcanzan estándares internacionales de sostenibilidad y reciclaje","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"03/06/2026","medio":"larepublica.co","titular":"Vive Claro tuvo máximo reconocimiento en estándar internacional de sostenibilidad","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"03/06/2026","medio":"Caracol Radio","titular":"El fenómeno K-pop, conciertos en Bogotá, su apoyo a Iván Cepeda, su impacto en la política en Colombia rumbo a la segunda vuelta presidencial","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"03/06/2026","medio":"redmas.com.co","titular":"Acceda a la preventa de Slayer con Claro Club: la banda de metal se presentará el 5 de diciembre en el Vive Claro, en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"03/06/2026","medio":"redmas.com.co","titular":"Vive Claro, primer estadio reconocido en Colombia bajo la metodología internacional Eventos Zero Waste","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"03/06/2026","medio":"impactamag.com","titular":"La panela colombiana se transforma en destilados premium y artesanales para Expolicores 2026","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"04/06/2026","medio":"semana.com","titular":"Slayer, la banda insignia del thrash que regresa a la capital tocando un disco histórico y revoltoso","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"04/06/2026","medio":"agriculturayganaderia.com","titular":"Fedepanela presenta el futuro de los destilados colombianos en Expolicores 2026","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"04/06/2026","medio":"bluradio.com","titular":"Vive Claro es reconocido bajo el estándar internacional Zero Waste","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"04/06/2026","medio":"La República","titular":"Reconocen a Vive Claro en método Zero Waste","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"04/06/2026","medio":"ovidiohoyos.com","titular":"La Industria Licorera del Cauca exhibe sus productos galardonados en Expolicores Bogotá 2026","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"04/06/2026","medio":"zonaimpacto.com","titular":"Tapa Roja hace su apuesta en Expolicores para convertirse en la bebida de los colombianos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"05/06/2026","medio":"larepublica.co","titular":"JetSmart anunció la inauguración de su nueva ruta que conecta a la capital con Cúcuta","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"05/06/2026","medio":"caracol.com.co","titular":"Escenario Vive Claro obtiene reconocimiento Zero Waste por su gestión de residuos","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"07/06/2026","medio":"revistawhatsup.com","titular":"Romeo Santos y Prince Royce llegan con su gira 'Mejor Tarde Que Nunca Tour 2026' al Vive Claro de Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"09/06/2026","medio":"impactamag.com","titular":"Secretaría de la Mujer instalará puntos seguros para prevenir violencias de género en el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"10/06/2026","medio":"bogota.gov.co","titular":"Bogotá promueve estrategia contra acoso a mujeres en eventos masivos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"10/06/2026","medio":"elcolombiano.com","titular":"Maná vuelve a Colombia para celebrar sus 40 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"caracol.com.co","titular":"Maná llega a Bogotá con su Vivir Sin Aire Tour y celebrará 40 años de trayectoria","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"bluradio.com","titular":"Maná regresa a Colombia y lo hará a nivel de un estadio en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"agenciapi.co","titular":"Maná regresará a Bogotá con un único concierto","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"ifmnoticias.com","titular":"Maná celebrará sus 40 años de carrera con un concierto en Bogotá y una gira histórica por estadios de Latinoamérica","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"lafm.com.co","titular":"Maná anuncia concierto en Bogotá para celebrará 40 años de carrera con su show 'Vivir Sin Aire Tour'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"noticiasrcn.com","titular":"MANÁ anuncia concierto en Bogotá: será su único show en Colombia de la nueva gira","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"caracol.com.co","titular":"Maná regresa a Colombia para celebrar 40 años de carrera artística con su 'Vivir sin aire tour'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"eltiempo.com","titular":"Maná celebrará sus 40 años con un concierto en Bogotá y una gira de estadios por varios países de América Latina","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"ntn24.com","titular":"Tras su presentación en la inauguración del Mundial, confirman fechas de Maná en importantes recintos de Latinoamérica","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"noticiascaracol.com","titular":"Maná regresará a Colombia para celebrar 40 años de trayectoria: fecha y lugar del evento","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"elheraldo.co","titular":"Maná anuncia su regreso a Colombia con el 'Vivir sin aire tour' tras 40 años de carrera","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"publimetro.co","titular":"Maná anuncia concierto en Bogotá: la banda celebrará sus 40 años con el Vivir Sin Aire Tour","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"eje21.com.co","titular":"Maná comenzará en Bogotá una gira de estadios por Latinoamérica","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"Cablenoticias","titular":"Transmisión del partido entre Portugal y Colombia","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"Canal Caracol","titular":"Maná llegó a Colombia con 'Vivir sin aire'","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"La FM","titular":"Maná confirma concierto en Bogotá y revive conversación sobre su impacto en la música en español","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"elcolombiano.com","titular":"Maná vuelve a Colombia para celebrar sus 40 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"esquirecolombia.com","titular":"Maná regresa a Bogotá con su primer Vive Claro: un concierto histórico en Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"lafm.com.co","titular":"Maná anuncia concierto en Bogotá para celebrará 40 años de carrera con su show 'Vivir Sin Aire Tour'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"minuto60.com","titular":"Precio de boletería para Maná en Colombia 2026 y fecha: la banda regresa tras el Mundial 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"msn.com","titular":"Maná regresará a Bogotá con un único concierto","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"msn.com","titular":"Maná regresa a Colombia para celebrar 40 años de carrera artística con su 'Vivir sin aire tour'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"redmas.com.co","titular":"Claro club abre preventa para Coffee Flow, el festival que celebra la pasión por el café y la cultura","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"tolimastereo.com","titular":"Maná anuncia concierto en Bogotá para celebrará 40 años de carrera con su show 'Vivir Sin Aire Tour'","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"zonacero.com","titular":"Maná celebrará sus 40 años de carrera con una gira que iniciará en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"impactamag.com","titular":"Claro club activa la preventa exclusiva para el festival cultural Coffee Flow","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"11/06/2026","medio":"positiva.fm","titular":"¡MANÁ ANUNCIA SU PRIMER VIVE CLARO!","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"diariodelcauca.com.co","titular":"Romeo Santos y Prince Royce regresan a Bogotá como una dupla","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"elespectador.com","titular":"Maná regresa a Colombia a celebrar 40 años. Fecha y lugar del concierto","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"farandula.co","titular":"Maná anuncia su primer Vive Claro, único show en Colombia de su nueva gira","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"diariodelsur.com.co","titular":"Romeo Santos y Prince Royce regresan a Bogotá como una dupla","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"hsbnoticias.com","titular":"Romeo Santos y Prince Royce regresan a Bogotá como una dupla","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"eltiempo.com","titular":"Vive Claro obtiene la máxima certificación ambiental tras el concierto de Ed Sheeran en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"laopinion.co","titular":"Maná regresará a Colombia con su gira de aniversario","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"elperiodicodeportivo.com.co","titular":"Romeo Santos y Prince Royce regresan a Bogotá como una dupla","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"eluniversal.com.co","titular":"Del Mundial a Colombia: Maná confirma fecha para cantar sus clásicos","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"acis.org.co","titular":"Claro club abre preventa para Coffee Flow, el festival que celebra la pasión por el café y la cultura","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"Telemedellín","titular":"Novedades del mundo del entretenimiento","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"City TV","titular":"Maná anunció su regreso a Colombia","soporte":"TV","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"Colmundo Bogotá","titular":"Bogotá, epicentro cultural: Maná anuncia único concierto en Colombia el 28 de noviembre de 2026 en el Vive Claro","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"La Voz de Bogotá 930 AM","titular":"Maná anuncia gira internacional y confirma único concierto en el Vive Claro de Bogotá por sus 40 años","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"Radio YA! AM 1430","titular":"Maná iniciará en Bogotá su gira de estadios por Latinoamérica para celebrar 40 años de trayectoria","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"farandula.co","titular":"Emyl Rusev, Juliana y Juan Duque se unen para crear una colaboración explosiva: Así de rico","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"12/06/2026","medio":"msn.com","titular":"Maná confirma concierto en Bogotá tras su icónico show en el Mundial 2026: fecha, lugar y más detalles de su regreso a Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"Q'Hubo Cartagena","titular":"Maná anuncia su regreso a Colombia","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"El Teso","titular":"MANÁ ANUNCIA SU REGRESO A COLOMBIA","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"Q'Hubo Bogotá","titular":"MANA VUELVE A BOGOTÁ PARA CELEBRAR SUS 40 AÑOS","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"El Heraldo","titular":"Maná vuelve al país","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"nacioncolombia.com","titular":"Maná regresa a Bogotá con el Vivir Sin Aire Tour su gira de 40 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"semana.com","titular":"Maná confirma concierto en Bogotá tras su icónico show en el Mundial 2026: fecha, lugar y más detalles de su regreso a Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"12/06/2026","medio":"technocio.com","titular":"Claro club abre preventa para Coffee Flow","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"13/06/2026","medio":"Canal RCN","titular":"Concierto de Maná en Colombia","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"15/06/2026","medio":"canaltrece.com.co","titular":"Maná anuncia concierto en Bogotá por sus 40 años de trayectoria","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/06/2026","medio":"inspirayconecta.blogspot.com","titular":"MANÁ anuncia su primer vive claro, único show en Colombia de su nueva gira","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/06/2026","medio":"inspirayconecta.blogspot.com","titular":"Claro club abre preventa para Coffee Flow, el festival que celebra la pasión por el café y la cultura","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"15/06/2026","medio":"Caracol Radio","titular":"Maná abrirá en Bogotá su gira 'Vivir sin aire tour'","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"16/06/2026","medio":"revistawhatsup.com","titular":"¡MANÁ ANUNCIA SU PRIMER VIVE CLARO!","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/06/2026","medio":"bolivarense.com","titular":"Maná regresa a Colombia: la banda celebrará 40 años","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"16/06/2026","medio":"ADN Cali","titular":"MANÁ ANUNCIÓ SU REGRESO A BOGOTÁ","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"16/06/2026","medio":"ADN Medellín","titular":"MANÁ ANUNCIÓ SU REGRESO A BOGOTÁ","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"16/06/2026","medio":"ADN Barranquilla","titular":"MANÁ ANUNCIÓ SU REGRESO A BOGOTÁ","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"16/06/2026","medio":"ADN Bogotá","titular":"MANÁ ANUNCIÓ SU REGRESO A BOGOTÁ","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"16/06/2026","medio":"impactamag.com","titular":"Maná iniciará su gira de conciertos en Bogotá tras presentarse en la inauguración del Mundial de Fútbol","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/06/2026","medio":"garrapatudo.com","titular":"Día Internacional del Yoga: cuatro mitos que aún alejan a las personas de esta disciplina","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"17/06/2026","medio":"larepublica.co","titular":"India celebra el Día Internacional del Yoga con actividades en varias ciudades de Colombia","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"17/06/2026","medio":"lescuentoque.com.co","titular":"DÍA INTERNACIONAL DEL YOGA","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"17/06/2026","medio":"elcolombiano.com","titular":"Slayer se presentará en Colombia con su clásico Reign in Blood","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/06/2026","medio":"Canal Caracol","titular":"Maná celebra cuatro décadas de trayectoria","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"17/06/2026","medio":"technocio.com","titular":"Con Claro club accede a la preventa para el concierto de Maná","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/06/2026","medio":"impactamag.com","titular":"Claro club habilita la preventa exclusiva para el regreso de Maná a Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/06/2026","medio":"observauto.com","titular":"Circuito Pony Malta: se abre boletería para el festival en Barranquilla","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"17/06/2026","medio":"zonacaptiva.com","titular":"Día Internacional del Yoga ayuda a derribar mitos sobre esta práctica de bienestar","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"18/06/2026","medio":"corporatnewslatam.blogspot.com","titular":"Día Internacional del Yoga: cuatro mitos que aún alejan a las personas de esta disciplina","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"18/06/2026","medio":"fullmagazinenoticias.blogspot.com","titular":"Día Internacional del Yoga: mitos que vale la pena dejar atrás y actividad gratuita","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"18/06/2026","medio":"alo.co","titular":"Día Internacional del Yoga: cuatro mitos que aún alejan a las personas de esta disciplina","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"18/06/2026","medio":"canaltrece.com.co","titular":"Maná conmemora 40 años de trayectoria con su gira «Vivir Sin Aire Tour» y confirma concierto en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"18/06/2026","medio":"noticiascaracol.com","titular":"Slayer celebrará 40 años de 'Reign In Blood' en Bogotá: fecha y precio de las entradas","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"18/06/2026","medio":"revistawhatsup.com","titular":"Día Internacional del Yoga: mitos que vale la pena dejar atrás y actividad gratuita","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"18/06/2026","medio":"elfrente.com.co","titular":"Maná regresa a Colombia: Bogotá será la única parada de la banda en el país durante 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"18/06/2026","medio":"Canal Uno","titular":"Maná celebrará 40 años de trayectoria en Bogotá","soporte":"TV","sentimiento":"Positivo"},{"fecha":"18/06/2026","medio":"City TV","titular":"Maná se presenta en Bogotá el 28 de noviembre","soporte":"TV","sentimiento":"Positivo"},{"fecha":"18/06/2026","medio":"redmas.com.co","titular":"Preventa para el concierto de Maná con Claro Club: así podrá descargar el cupón de preventa","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"19/06/2026","medio":"alo.co","titular":"Óscar Dorado, creador del cántico que busca unir al país y a la selección","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"19/06/2026","medio":"Canal RCN","titular":"El claro Fútbol Fest transmitirá el partido de la Selección Colombia","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"19/06/2026","medio":"ADN Medellín","titular":"El yoga busca romper mitos en su día","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"19/06/2026","medio":"ADN Cali","titular":"El yoga busca romper mitos en su día","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"19/06/2026","medio":"ADN Bogotá","titular":"El yoga busca romper mitos en su día","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"19/06/2026","medio":"ADN Barranquilla","titular":"El yoga busca romper mitos en su día","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"20/06/2026","medio":"entrenotasymas.com","titular":"Día Internacional del Yoga: cuatro mitos que aún alejan a las personas de esta disciplina","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"20/06/2026","medio":"El Espectador","titular":"Sergio Vallín: 'Nunca han visto a Maná como van a verlo esta vez'","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"21/06/2026","medio":"elespectador.com","titular":"Maná cumple 40 años ¿Cómo ha logrado mantenerse la banda? Revelaciones de uno de sus músicos","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"21/06/2026","medio":"inspirayconecta.blogspot.com","titular":"Día Internacional del Yoga: cuatro mitos que aún alejan a las personas de esta disciplina","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"22/06/2026","medio":"El Colombiano","titular":"Un segundo semestre cargado de conciertos","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"22/06/2026","medio":"tecnogus.com.co","titular":"Con Claro club accede a la preventa para el concierto de Maná","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"23/06/2026","medio":"impactamag.com","titular":"Siete avances que ampliaron oportunidades para las mujeres de Bogotá en el primer semestre de 2026","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"23/06/2026","medio":"revistaelcongreso.com","titular":"7 Grandes Avances para las Mujeres en Bogotá (Primer Semestre 2026)","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"24/06/2026","medio":"guapacho.com","titular":"Blessd, Pipe Bueno, La 33 y Aria Vega calientan motores para el Claro Fútbol Fest, a pocos días del gran encuentro en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"24/06/2026","medio":"impactamag.com","titular":"Música y fútbol se toman Bogotá con un masivo festival que busca alcanzar un Récord Guinness","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"24/06/2026","medio":"alo.co","titular":"Maná celebrará 40 años de historia con una gira de estadios que llegará a Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"24/06/2026","medio":"redmas.com.co","titular":"Boletas 2x1 para el Claro Fútbol Fest en Bogotá: Blessd, Pipe Bueno, Aria Vega y La 33 se presentarán en Vive Claro","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"24/06/2026","medio":"bluradio.com","titular":"Planes para ver Colombia vs. Portugal en Bogotá: en familia y algunos gratis","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"24/06/2026","medio":"acis.org.co","titular":"Blessd, Pipe Bueno, La 33 y Aria Vega calientan motores para el Claro Fútbol Fest, a pocos días del gran encuentro en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"24/06/2026","medio":"impactamag.com","titular":"Bogotá despliega una amplia estrategia de prevención contra las violencias de género en zonas de alta afluencia ciudadana","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"24/06/2026","medio":"pulzo.com","titular":"Logros destacados de la Secretaría Distrital de la Mujer Bogotá 2026: inclusión, prevención y autonomía","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"24/06/2026","medio":"bogota.gov.co","titular":"Bogotá ha fortalecido la atención y los servicios para mujeres en 2026","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"24/06/2026","medio":"15 Minutos","titular":"'SU BODA, UN VERDADERO CUENTO'","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"24/06/2026","medio":"15 Minutos","titular":"MÚSICA Y FÚTBOL EN UNA SOLA FIESTA","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"24/06/2026","medio":"15 Minutos","titular":"VIVE CLARO: LA AGENDA QUE PONE A BOGOTÁ A VIBRAR","soporte":"Prensa","sentimiento":"Positivo"},{"fecha":"25/06/2026","medio":"valoraanalitik.com","titular":"Bogotá tendrá un Fan Fest para las fases finales del Mundial 2026: Así será Tribuna Club","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/06/2026","medio":"eltiempo.com","titular":"Colombia vs. Portugal: los mejores planes en Bogotá para ver el partido del Mundial 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/06/2026","medio":"economiaydesarrollo.com","titular":"Presentan tribuna club en Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/06/2026","medio":"tropicanafm.com","titular":"Viva 'la llamada bacana' con DiDi y Tropicana: paso a paso para participar","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/06/2026","medio":"portalgeek.co","titular":"Los Aliados Oficiales de la Copa Mundial de la FIFA 2026 presentan Tribuna Club en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"25/06/2026","medio":"El Nuevo Siglo","titular":"Arranca preventa para 'Vivir sin aire'","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"25/06/2026","medio":"soycinefanatico.blogspot.com","titular":"Bogotá tendrá su propia sede para vivir la Copa Mundial de la FIFA 2026","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"26/06/2026","medio":"garrapatudo.com","titular":"UNA SOLA SEDE. UNA MISMA PASIÓN","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"garrapatudo.com","titular":"Los Aliados Oficiales De La Copa Mundial De La Fifa 2026 Presentan Tribuna Club En Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"larevue.com.co","titular":"Blessd, Pipe Bueno, La 33 y Aria Vega ponen el ritmo en el Claro Fútbol Fest","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"eltiempo.com","titular":"Estos son los eventos para disfrutar el puente festivo en Bogotá","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"las2orillas.co","titular":"Una alianza de 20 pesadas marcas para poner el Mundial en Bogotá con pantallas gigantes junto al Estadio El Campín","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"laxmasmusica.com","titular":"The Hives revive su gira latinoamericana","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"26/06/2026","medio":"noticiascaracol.com","titular":"Planes para ver Colombia vs. Portugal en Bogotá el sábado 27 de junio","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"futbolred.com","titular":"No se quede en casa: Planes en Bogotá para ver Colombia vs Portugal","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"Caracol Radio","titular":"Vive Claro será uno de los principales puntos para ver el Colombia-Portugal en Bogotá","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"La FM","titular":"Operativo y estrategia de la Selección Colombia ante Portugal","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"technocio.com","titular":"Los aliados oficiales de la Copa Mundial de la FIFA 2026 presentan Tribuna Club en Colombia","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"26/06/2026","medio":"tecnogus.com.co","titular":"Tribuna Club Bogotá: la sede oficial para vivir el Mundial de la FIFA 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"elespectador.com","titular":"Colombia vs. Portugal hoy: hora, dónde ver y planes en Bogotá para el Mundial 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"msn.com","titular":"Colombia vs. Portugal hoy: hora, dónde ver y planes en Bogotá para el Mundial 2026","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"msn.com","titular":"¿Dónde ver el partido de Colombia vs Portugal hoy en Bogotá? Lista de pantallas gigantes, 'fan zones' y tribunas","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"eltiempo.com","titular":"Fan Zones en Bogotá para ver el partido de la Selección Colombia en el Mundial","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"noticiascaracol.com","titular":"Vea acá el resumen de la Selección Colombia vs. Portugal; mejores jugadas, gol anulado y más","soporte":"Internet","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"City TV","titular":"Selección Colombia empata con Portugal, lidera el Grupo K y enfrentará a Ghana en los dieciseisavos del Mundial 2026","soporte":"TV","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"Canal RCN","titular":"Desde el Vive Claro","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"Canal RCN","titular":"Vive Claro en Bogotá ofrece jornada de música y transmisión del partido Colombia vs Portugal con varios artistas invitados","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"Canal RCN","titular":"Así se vive el ambiente en el Vive Claro para el partido de la selección Colombia","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"Canal RCN","titular":"Bogotá se viste de tricolor con pantallas y zonas de apoyo para el partido de Colombia ante Portugal en varios puntos de la ciudad","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"27/06/2026","medio":"El Tiempo","titular":"Ruta cultural: ¿qué hacer en Bogotá en este puente festivo?","soporte":"Prensa","sentimiento":"Neutro"},{"fecha":"28/06/2026","medio":"fullmagazinenoticias.blogspot.com","titular":"LOS ALIADOS OFICIALES DE LA COPA MUNDIAL DE LA FIFA 2026 PRESENTAN TRIBUNA CLUB EN COLOMBIA","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"28/06/2026","medio":"gastronomiayturismozonagt.blogspot.com","titular":"LOS ALIADOS OFICIALES DE LA COPA MUNDIAL DE LA FIFA 2026 PRESENTAN TRIBUNA CLUB EN COLOMBIA","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"28/06/2026","medio":"magazinelaopinion.blogspot.com","titular":"LOS ALIADOS OFICIALES DE LA COPA MUNDIAL DE LA FIFA 2026 PRESENTAN TRIBUNA CLUB EN COLOMBIA","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"28/06/2026","medio":"sarahleeteinforma.blogspot.com","titular":"LOS ALIADOS OFICIALES DE LA COPA MUNDIAL DE LA FIFA 2026 PRESENTAN TRIBUNA CLUB EN COLOMBIA","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"28/06/2026","medio":"revistawhatsup.com","titular":"LOS ALIADOS OFICIALES DE LA COPA MUNDIAL DE LA FIFA 2026 PRESENTAN TRIBUNA CLUB EN COLOMBIA","soporte":"Internet","sentimiento":"Neutro"},{"fecha":"28/06/2026","medio":"Canal RCN","titular":"Partido de la Selección Colombia también se vivió en el Vive Claro","soporte":"Radio","sentimiento":"Positivo"},{"fecha":"29/06/2026","medio":"pluralidadz.com","titular":"Tiene que nacer acá pa' meterle así de rico: Emyl Rusev la rompe con la Selección Colombia","soporte":"Internet","sentimiento":"Neutro"}]
+};
+
+// ══════════════════════════════════════════
+// DATOS INFORME DE GESTIÓN
+// ══════════════════════════════════════════
+const DATOS_IG = {
+  "Mayo 2026": {
+    objetivos: [
+      {icon:"✍️", texto:"Consolidar el posicionamiento de Luz Ángela Castro en espacios editoriales estratégicos como Forbes Colombia."},
+      {icon:"🤝", texto:"Apoyar la Junta de Acción Comunal de Salitre el Greco en su proceso organizativo y electoral."},
+      {icon:"📡", texto:"Monitorear la controversia por el impacto del ruido del Vive Claro en la comunidad, en el marco de la mesa técnica liderada por la representante Jeniffer Pedraza."}
+    ],
+    estrategia: [
+      "Gestión directa con Las2Orillas para modificar el tono y contenido de publicación sobre Live Nation y el supuesto \"monopolio\" en Colombia, logrando ajustes editoriales favorables.",
+      "Coordinación de reuniones con DMZ, Trending Labs y Jorge Humberto Vargas para alinear la estrategia de cara a las elecciones de la JAC de Salitre el Greco.",
+      "Cobertura en medios para el Claro Fútbol Fest y el inicio de ventas del concierto de Romeo Santos en Vive Claro.",
+      "Acompañamiento a la periodista de IQ Magazine durante el concierto de Ed Sheeran y recopilación de feedback del evento.",
+      "Complemento de la estrategia de medios con mensajes clave del equipo OCESA."
+    ],
+    tareas: [
+      {tag:"medios", label:"Medios", texto:"Publicaciones del Claro Fútbol Fest conseguidas en Noticias RCN, Bluradio y Noticias Caracol con alta visibilidad."},
+      {tag:"estrategia", label:"Estrategia", texto:"Complemento de estrategia de medios — preparación del informe lado B con mensajes clave para el equipo cliente."},
+      {tag:"comunidad", label:"Comunidad", texto:"Elaboración de borrador de Gaceta para la JAC Salitre el Greco como insumo del proceso electoral."},
+      {tag:"editorial", label:"Editorial", texto:"Corrección editorial exitosa en Las2Orillas sobre la cobertura de Live Nation y Ticketmaster en Colombia."}
+    ],
+    entregables: [
+      "Complemento estrategia de medios — informe lado B",
+      "Borrador Gaceta Salitre el Greco"
+    ],
+    notas: {
+      stats: [{val:2,label:"TV"},{val:1,label:"Radio"},{val:1,label:"Prensa"},{val:1,label:"Negocios"}],
+      items: [
+        {medio:"Forbes Colombia", badge:"Negocios", url:"https://forbes.co/forbes-women/mujeres-poderosas-2026-luz-angela-castro", desc:"Mujeres Poderosas 2026 — Luz Ángela Castro. Posicionamiento de alto impacto para el liderazgo del cliente."},
+        {medio:"Bluradio", badge:"Radio", url:"https://www.bluradio.com/entretenimiento/fans-de-blessd-podran-ver-el-partido-colombia-vs-portugal-con-el-asi-podran-hacerlo-so35", desc:"Cobertura del Claro Fútbol Fest — Colombia vs Portugal con show de Blessd en Vive Claro."},
+        {medio:"El Tiempo", badge:"Prensa", url:"https://www.eltiempo.com/cultura/gente/vive-claro-alista-jornada-masiva-con-futbol-musica-en-vivo-y-transmision-de-colombia-vs-portugal-mas-de-ocho-horas-de-programacion-en-vivo-3553906", desc:"Vive Claro alista jornada masiva con fútbol, música en vivo y más de 8 horas de programación en vivo."},
+        {medio:"Noticias Caracol", badge:"TV", url:"https://www.noticiascaracol.com/entretenimiento/partido-colombia-vs-portugal-se-transmitira-en-vivo-en-bogota-con-show-de-blessd-aria-vega-y-mas-rg10", desc:"Colombia vs Portugal en vivo en Bogotá con show de Blessd, Aria Vega y más artistas en el Vive Claro."},
+        {medio:"Noticias RCN", badge:"TV", url:"https://www.noticiasrcn.com/tendencias/seleccion-colombia-vs-portugal-por-mundial-2026-se-podra-ver-en-vivo-en-el-vive-claro-junto-a-blessd-pipe-bueno-y-aria-vega-1019028", desc:"Colombia vs Portugal por el Mundial 2026 — cobertura del Vive Claro con Blessd, Pipe Bueno y Aria Vega."}
+      ]
+    }
+  },
+  "Junio 2026": {
+    objetivos: [
+      {icon:"🌱", texto:"Fortalecer el posicionamiento reputacional de Vive Claro mediante la difusión de hitos de sostenibilidad."},
+      {icon:"🏛️", texto:"Gestionar el relacionamiento con actores institucionales y de interés para anticipar riesgos."},
+      {icon:"🎯", texto:"Identificar oportunidades estratégicas de posicionamiento y reconocimiento corporativo."},
+      {icon:"📊", texto:"Monitorear permanentemente la percepción pública y mediática de OCESA y Vive Claro."}
+    ],
+    estrategia: [
+      "Posicionamiento proactivo de los logros ambientales de Vive Claro en medios nacionales.",
+      "Gestión de asuntos públicos con actores políticos involucrados en conversaciones sobre el proyecto.",
+      "Construcción de alianzas institucionales con organizaciones sociales para fortalecer el impacto comunitario.",
+      "Seguimiento permanente a la conversación pública mediante análisis de sentimiento y monitoreo de medios."
+    ],
+    tareas: [
+      {tag:"otro", label:"Otro", texto:"Puente con la Fundación Juntos Se Puede para que el Vive Claro funcionara como punto de acopio para recibir las ayudas que se enviaran a Venezuela, luego del desastre ocasionado por los sismos."},
+      {tag:"otro", label:"Otro", texto:"Investigación y perfil sobre Talía Osorio, fundadora de 30 Decibeles."},
+      {tag:"otro", label:"Otro", texto:"Inscripción a los premios Portafolio 2026, en las categorías de Gestión Ambiental y Sostenibilidad, y Líder Empresarial del Año."},
+      {tag:"publicacion", label:"Publicación en medios", texto:"Gestión para publicación en diferentes medios sobre el reconocimiento Zero Waste obtenido por Vive Claro. Se obtuvieron publicaciones en medios tier 1 como Caracol Radio, Bluradio, El Tiempo, La República y Publimetro."},
+      {tag:"asuntos", label:"Asuntos Públicos", texto:"Reunión con la Representante a la Cámara, Julia Miranda, por la mesa técnica que se realizó en contra del Vive Claro."},
+      {tag:"reunion", label:"Reunión / llamada", texto:"Reunión con el equipo de DMZ, por las elecciones a la JAC y feedback/balance de la asamblea que se llevó a cabo."},
+      {tag:"entregable", label:"Entregable / informe", texto:"Se realizó el informe de Net Sentiment después de haber revisado todas las publicaciones del mes de junio y haberles otorgado su respectivo sentimiento."}
+    ],
+    entregables: [
+      "Informe de Net Sentiment — Junio 2026"
+    ],
+    notas: {
+      stats: [{val:0,label:"TV"},{val:2,label:"Radio"},{val:3,label:"Prensa"},{val:0,label:"Negocios"}],
+      items: [
+        {medio:"Bluradio", badge:"Radio", url:"https://www.bluradio.com/entretenimiento/vive-claro-es-reconocido-bajo-el-estandar-internacional-zero-waste-so35", desc:"Vive Claro es reconocido bajo el estándar internacional Zero Waste por su gestión sostenible de residuos."},
+        {medio:"La República", badge:"Prensa", url:"https://www.larepublica.co/empresas/vive-claro-tuvo-maximo-reconocimiento-en-estandar-internacional-de-sostenibilidad-4407520", desc:"Vive Claro obtuvo el máximo reconocimiento en el estándar internacional de sostenibilidad Zero Waste."},
+        {medio:"El Tiempo", badge:"Prensa", url:"https://www.eltiempo.com/cultura/musica-y-libros/vive-claro-obtiene-la-maxima-certificacion-ambiental-tras-el-concierto-de-ed-sheeran-en-bogota-3563915", desc:"Vive Claro obtiene la máxima certificación ambiental tras el concierto de Ed Sheeran en Bogotá."},
+        {medio:"Caracol Radio", badge:"Radio", url:"https://caracol.com.co/2026/06/05/escenario-vive-claro-obtiene-reconocimiento-zero-waste-por-su-gestion-de-residuos/", desc:"El escenario Vive Claro obtiene reconocimiento Zero Waste por su gestión responsable de residuos."},
+        {medio:"Publimetro", badge:"Prensa", url:"https://www.publimetro.co/cultura/2026/06/03/eventos-masivos-en-colombia-alcanzan-estandares-internacionales-de-sostenibilidad-y-reciclaje/", desc:"Eventos masivos en Colombia, incluido Vive Claro, alcanzan estándares internacionales de sostenibilidad y reciclaje."}
+      ]
+    }
+  }
+};
+
+// ══════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════
+let filtroMes   = 'Mayo 2026';
+let filtroCanal = 'Todos';
+let filtroSent  = 'Todos';
+let searchQ     = '';
+let igMes       = 'Mayo 2026';
+const COL_POS = '#2d8a5e', COL_NEG = '#c42e20', COL_NEU = '#8a6d00';
+const CANAL_COLORS = { Internet:'#c42e20', Prensa:'#510000', Radio:'#8a6d00', TV:'#2d5f8a' };
+const MES_ORDER = ['Abril 2026','Mayo 2026','Junio 2026'];
+const MES_ABBR  = {'Abril 2026':'abr','Mayo 2026':'may','Junio 2026':'jun'};
+const PERIODOS  = {'Abril 2026':'1–30 abr','Mayo 2026':'1–31 may','Junio 2026':'1–30 jun'};
+let chartTendencia, chartSentimiento, chartCanal;
+
+function getFuente(mes){ return mes === 'Junio 2026' ? 'Buho' : 'Siglo Data'; }
+function getPrevMes(mes){ const i = MES_ORDER.indexOf(mes); return i > 0 ? MES_ORDER[i-1] : null; }
+
+function pct(n,t) { return t===0?'0%':(n/t*100).toFixed(1).replace('.',',')+' %'; }
+function ns(p,n,t) { return t===0?0:(p-n)/t*100; }
+function fmtNS(v) { return (v>=0?'+':'')+v.toFixed(1).replace('.',',')+' %'; }
+
+function getFiltered() {
+  const q=searchQ.toLowerCase();
+  return (DATOS[filtroMes]||[]).filter(d=>{
+    if(filtroCanal!=='Todos'&&d.soporte!==filtroCanal) return false;
+    if(filtroSent!=='Todos'&&d.sentimiento!==filtroSent) return false;
+    if(q&&!d.medio.toLowerCase().includes(q)&&!d.titular.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function buildDayData(data) {
+  const dm={};
+  data.forEach(d=>{const day=d.fecha.split('/')[0];if(!dm[day])dm[day]={Positivo:0,Negativo:0,Neutro:0};dm[day][d.sentimiento]++;});
+  const days=Object.keys(dm).sort();
+  const ml=MES_ABBR[filtroMes]||'';
+  return{labels:days.map(d=>d+' '+ml),pos:days.map(d=>dm[d].Positivo),neg:days.map(d=>dm[d].Negativo),neu:days.map(d=>dm[d].Neutro)};
+}
+
+function render() {
+  searchQ=document.getElementById('searchInput').value;
+  const data=getFiltered();
+  const total=data.length;
+  const pos=data.filter(d=>d.sentimiento==='Positivo').length;
+  const neg=data.filter(d=>d.sentimiento==='Negativo').length;
+  const neu=data.filter(d=>d.sentimiento==='Neutro').length;
+  const netV=ns(pos,neg,total);
+  document.getElementById('heroMes').textContent=filtroMes;
+  document.getElementById('heroTotal').textContent=total;
+  const sc={};data.forEach(d=>sc[d.soporte]=(sc[d.soporte]||0)+1);
+  const dom=Object.entries(sc).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('heroDominante').textContent=dom?`${dom[0]} · ${dom[1]}`:'—';
+  document.getElementById('heroPeriodo').textContent=PERIODOS[filtroMes]||'';
+  document.getElementById('heroFuente').textContent=getFuente(filtroMes);
+  document.getElementById('footerFuente').textContent=getFuente(filtroMes);
+  document.getElementById('countActivo').textContent=total;
+  document.getElementById('kpiTotal').textContent=total;
+  document.getElementById('kpiPos').textContent=pos;
+  document.getElementById('kpiNeg').textContent=neg;
+  document.getElementById('kpiNeu').textContent=neu;
+  document.getElementById('kpiPosPct').textContent=pct(pos,total);
+  document.getElementById('kpiNegPct').textContent=pct(neg,total);
+  document.getElementById('kpiNeuPct').textContent=pct(neu,total);
+  document.getElementById('kpiNetSent').textContent=fmtNS(netV);
+  const otraMes=getPrevMes(filtroMes);
+  const compEl=document.getElementById('kpiNetComp');
+  if(otraMes && filtroCanal==='Todos' && filtroSent==='Todos' && !searchQ){
+    const od=DATOS[otraMes]||[];
+    const op=od.filter(d=>d.sentimiento==='Positivo').length;
+    const on=od.filter(d=>d.sentimiento==='Negativo').length;
+    const oNet=ns(op,on,od.length);
+    const diff=netV-oNet;
+    const dlbl='vs. '+otraMes.replace(' 2026','');
+    const cls=diff>0?'up':diff<0?'down':'same';
+    const arrow=diff>0?'↑':diff<0?'↓':'→';
+    compEl.innerHTML=`<span class="comp-badge ${cls}">${arrow} ${diff>=0?'+':''}${diff.toFixed(1).replace('.',',')} pp ${dlbl}</span>`;
+  } else { compEl.innerHTML=''; }
+  updateCharts(data,pos,neg,neu,sc,total);
+  renderComparativa();
+  renderRanking(data);
+  renderTabla(data);
+}
+
+function initCharts() {
+  const d0=DATOS['Mayo 2026'];
+  const p0=d0.filter(d=>d.sentimiento==='Positivo').length;
+  const n0=d0.filter(d=>d.sentimiento==='Negativo').length;
+  const ne0=d0.filter(d=>d.sentimiento==='Neutro').length;
+  const t0=d0.length;
+  const td=buildDayData(d0);
+  chartTendencia=new Chart(document.getElementById('chartTendencia').getContext('2d'),{type:'line',data:{labels:td.labels,datasets:[{label:'Positivo',data:td.pos,borderColor:COL_POS,backgroundColor:'rgba(45,138,94,.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:COL_POS,tension:.35,fill:false},{label:'Negativo',data:td.neg,borderColor:COL_NEG,backgroundColor:'rgba(196,46,32,.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:COL_NEG,tension:.35,fill:false},{label:'Neutro',data:td.neu,borderColor:COL_NEU,backgroundColor:'rgba(138,109,0,.08)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:COL_NEU,tension:.35,fill:false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{backgroundColor:'white',borderColor:'#e4e4e4',borderWidth:1,titleColor:'#0f0f0f',bodyColor:'#555',padding:12}},scales:{x:{grid:{color:'#f0f0f0'},ticks:{font:{family:'Inter',size:10},color:'#757575',maxTicksLimit:20}},y:{grid:{color:'#f0f0f0'},ticks:{font:{family:'Inter',size:11},color:'#757575',stepSize:1},beginAtZero:true}}}});
+  chartSentimiento=new Chart(document.getElementById('chartSentimiento').getContext('2d'),{type:'doughnut',data:{labels:[`Positivo ${pct(p0,t0)}`,`Negativo ${pct(n0,t0)}`,`Neutro ${pct(ne0,t0)}`],datasets:[{data:[p0,n0,ne0],backgroundColor:[COL_POS,COL_NEG,COL_NEU],borderWidth:3,borderColor:'white'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'white',borderColor:'#e4e4e4',borderWidth:1,titleColor:'#0f0f0f',bodyColor:'#555',callbacks:{label:ctx=>ctx.label}}}}});
+  buildDonutLegend(chartSentimiento,'legendSent');
+  const cc={};d0.forEach(d=>cc[d.soporte]=(cc[d.soporte]||0)+1);
+  const cL=Object.keys(cc),cV=cL.map(c=>cc[c]),cC=cL.map(c=>CANAL_COLORS[c]||'#ccc');
+  chartCanal=new Chart(document.getElementById('chartCanal').getContext('2d'),{type:'doughnut',data:{labels:cL.map(c=>`${c} ${pct(cc[c],t0)}`),datasets:[{data:cV,backgroundColor:cC,borderWidth:3,borderColor:'white'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'white',borderColor:'#e4e4e4',borderWidth:1,titleColor:'#0f0f0f',bodyColor:'#555',callbacks:{label:ctx=>ctx.label}}}}});
+  buildDonutLegend(chartCanal,'legendCanal');
+}
+
+function buildDonutLegend(chart,id){const el=document.getElementById(id);if(!el)return;el.innerHTML=chart.data.labels.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${chart.data.datasets[0].backgroundColor[i]}"></div>${l}</div>`).join('');}
+
+function updateCharts(data,pos,neg,neu,sc,total){
+  const td=buildDayData(data);
+  chartTendencia.data.labels=td.labels;chartTendencia.data.datasets[0].data=td.pos;chartTendencia.data.datasets[1].data=td.neg;chartTendencia.data.datasets[2].data=td.neu;chartTendencia.update();
+  chartSentimiento.data.labels=[`Positivo ${pct(pos,total)}`,`Negativo ${pct(neg,total)}`,`Neutro ${pct(neu,total)}`];chartSentimiento.data.datasets[0].data=[pos,neg,neu];chartSentimiento.update();buildDonutLegend(chartSentimiento,'legendSent');
+  const cL=Object.keys(sc);chartCanal.data.labels=cL.map(c=>`${c} ${pct(sc[c],total)}`);chartCanal.data.datasets[0].data=cL.map(c=>sc[c]);chartCanal.data.datasets[0].backgroundColor=cL.map(c=>CANAL_COLORS[c]||'#ccc');chartCanal.update();buildDonutLegend(chartCanal,'legendCanal');
+}
+
+function renderComparativa(){
+  const compCard=document.getElementById('compCard');
+  const prevMes=getPrevMes(filtroMes);
+  if(!prevMes){ compCard.style.display='none'; return; }
+  compCard.style.display='';
+  document.getElementById('compTitulo').textContent=`Comparativa mensual · ${prevMes.replace(' 2026','')} vs. ${filtroMes}`;
+  const meses=[prevMes, filtroMes];
+  const html=meses.map(mes=>{const d=DATOS[mes]||[];const tot=d.length;const pos=d.filter(x=>x.sentimiento==='Positivo').length;const neg=d.filter(x=>x.sentimiento==='Negativo').length;const neu=d.filter(x=>x.sentimiento==='Neutro').length;const netV=ns(pos,neg,tot);const cls=netV>=50?'good':netV>=0?'':'bad';const isActive=mes===filtroMes;return`<div class="comp-mes" style="${isActive?'background:rgba(196,46,32,0.06);border:1.5px solid rgba(196,46,32,0.2);':''}"><div class="comp-mes-label">${mes}${isActive?' · activo':''}</div><div class="comp-mes-net ${cls}">${fmtNS(netV)}</div><div class="comp-mes-detail">${tot} notas · ${pos} pos · ${neg} neg · ${neu} neu</div><div class="comp-bars"><div class="comp-bar-row"><div class="comp-bar-label">Positivo</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:${tot?Math.round(pos/tot*100):0}%;background:${COL_POS}"></div></div><div class="comp-bar-val">${pct(pos,tot)}</div></div><div class="comp-bar-row"><div class="comp-bar-label">Negativo</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:${tot?Math.round(neg/tot*100):0}%;background:${COL_NEG}"></div></div><div class="comp-bar-val">${pct(neg,tot)}</div></div><div class="comp-bar-row"><div class="comp-bar-label">Neutro</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:${tot?Math.round(neu/tot*100):0}%;background:${COL_NEU}"></div></div><div class="comp-bar-val">${pct(neu,tot)}</div></div></div></div>`;}).join('');
+  document.getElementById('compGrid').innerHTML=html;
+}
+
+const TIPO_MAP={'Blu Radio':'Radio','Caracol Radio Bogotá':'Radio','La FM Radio':'Radio','Fuego Stereo':'Radio','El Tiempo':'Prensa','La República':'Prensa','ADN Bogotá':'Prensa','La Nación':'Prensa','Publimetro Bogotá':'Prensa','El Espectador':'Prensa','AL DIA BARRANQUILLA':'Prensa','REVISTA FORBES':'Prensa','Infobae':'Internet'};
+function d3soporte(medio,data){const h=data.find(d=>d.medio===medio);return h?h.soporte:'Internet';}
+
+function renderRanking(data){
+  const mc={};data.forEach(d=>mc[d.medio]=(mc[d.medio]||0)+1);
+  const sorted=Object.entries(mc).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const max=sorted[0]?sorted[0][1]:1;
+  document.getElementById('rankingBody').innerHTML=sorted.map(([medio,count],i)=>{const tipo=TIPO_MAP[medio]||d3soporte(medio,data);const bp=Math.round(count/max*100);return`<div class="ranking-row"><div class="ranking-num">${i+1}</div><div><div class="ranking-medio-nombre">${medio}</div><div class="ranking-medio-tipo">${tipo}</div></div><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:${bp}%;background:${CANAL_COLORS[tipo]||COL_NEG}"></div></div><div class="ranking-count">${count}</div></div>`;}).join('');
+}
+
+function renderTabla(data){
+  const body=document.getElementById('tablaBody');const empty=document.getElementById('tablaEmpty');
+  if(!data.length){body.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const SC={Positivo:'badge-pos',Negativo:'badge-neg',Neutro:'badge-neu'};
+  const SI={Positivo:'↑',Negativo:'↓',Neutro:'→'};
+  body.innerHTML=data.map(d=>`<tr><td class="fecha-cell">${d.fecha}</td><td class="medio-cell">${d.medio}</td><td><span class="canal-tag">${d.soporte}</span></td><td class="titular-cell">${d.titular}</td><td><span class="badge ${SC[d.sentimiento]}">${SI[d.sentimiento]} ${d.sentimiento}</span></td></tr>`).join('');
+}
+
+function setMes(mes){filtroMes=mes;render();}
+function setCanal(btn){filtroCanal=btn.dataset.canal;document.querySelectorAll('#filtroCanal .filtro-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+function setSent(btn){filtroSent=btn.dataset.sent;const CM={Positivo:'active-pos',Negativo:'active-neg',Neutro:'active-neu',Todos:'active'};document.querySelectorAll('#filtroSent .filtro-btn').forEach(b=>b.classList.remove('active','active-pos','active-neg','active-neu'));btn.classList.add(CM[filtroSent]||'active');render();}
+
+// ══════════════════════════════════════════
+// INFORME DE GESTIÓN — RENDER DINÁMICO
+// ══════════════════════════════════════════
+const IG_BADGE_CLASS = {TV:'tv',Radio:'radio',Prensa:'print',Negocios:'biz'};
+
+function renderIG(){
+  const d = DATOS_IG[igMes];
+  if(!d) return;
+  document.getElementById('igStatNotas').textContent = d.notas.items.length;
+  document.getElementById('igStatObjetivos').textContent = d.objetivos.length;
+  document.getElementById('igStatEntregables').textContent = d.entregables.length;
+  document.getElementById('igSecEyebrowObj').textContent = 'Periodo ' + igMes;
+
+  document.getElementById('igObjGrid').innerHTML = d.objetivos.map((o,i)=>`
+    <div class="ig-obj-card">
+      <div class="ig-obj-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="ig-obj-icon">${o.icon}</div>
+      <p>${o.texto}</p>
+    </div>`).join('');
+
+  document.getElementById('igStrategyList').innerHTML = d.estrategia.map((t,i)=>`
+    <div class="ig-strategy-item"><div class="ig-strategy-num">${i+1}</div><p>${t}</p></div>`).join('');
+
+  document.getElementById('igTasksGrid').innerHTML = d.tareas.map(t=>`
+    <div class="ig-task-card"><span class="ig-task-tag ${t.tag}">${t.label}</span><p>${t.texto}</p></div>`).join('');
+
+  document.getElementById('igDeliverables').innerHTML = d.entregables.map(e=>`
+    <div class="ig-deliverable-chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c42e20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${e}</div>`).join('');
+
+  document.getElementById('igStripCount').textContent = d.notas.items.length;
+  document.getElementById('igStripSub').textContent = 'notas en medios · ' + igMes;
+  document.getElementById('igStripStats').innerHTML = d.notas.stats.map(s=>`<div class="ig-strip-stat"><div class="sv">${s.val}</div><div class="sl">${s.label}</div></div>`).join('');
+
+  document.getElementById('igMediaGrid').innerHTML = d.notas.items.map(n=>`
+    <a class="ig-media-card" href="${n.url}" target="_blank" rel="noopener">
+      <div class="ig-media-card-top"><span class="ig-media-badge ig-badge-${IG_BADGE_CLASS[n.badge]||'print'}">${n.badge}</span><svg class="ig-media-arrow" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+      <div class="ig-media-name">${n.medio}</div>
+      <div class="ig-media-desc">${n.desc}</div>
+      <div class="ig-media-cta"><span class="ig-media-cta-link">Ver nota</span><svg class="ig-media-arrow" viewBox="0 0 24 24" fill="none" stroke="#c42e20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+    </a>`).join('');
+}
+
+function setIgMes(mes){ igMes = mes; renderIG(); }
+
+document.getElementById('footerFecha').textContent=new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'});
+window.addEventListener('DOMContentLoaded',()=>{initCharts();render();renderIG();});
+</script>
+</body>
+</html>
