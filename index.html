@@ -23,9 +23,26 @@
     --neg-bg:     #fdecea;
     --neu:        #8a6d00;
     --neu-bg:     #fdf6e3;
+    --topbar-h:    64px;
+    --maintabs-h:  46px;
+    --header-h:    calc(var(--topbar-h) + var(--maintabs-h));
   }
   * { margin:0; padding:0; box-sizing:border-box; }
+  
+  /* OVERFLOW CLIP: Previene el espacio blanco sin dañar el Sticky de iOS */
+  html, body { max-width: 100vw; overflow-x: clip; }
   body { font-family:'Inter',sans-serif; background:var(--fondo); color:var(--negro); line-height:1.5; -webkit-font-smoothing:antialiased; }
+
+  /* ─── SCROLLBAR OCULTA PARA MENÚS ─── */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ─── SCROLLBAR PERSONALIZADA PARA TABLAS ─── */
+  .scroll-fino::-webkit-scrollbar { width:6px; height:6px; }
+  .scroll-fino::-webkit-scrollbar-track { background:transparent; }
+  .scroll-fino::-webkit-scrollbar-thumb { background:#d3dae2; border-radius:10px; }
+  .scroll-fino::-webkit-scrollbar-thumb:hover { background:#b7c1cc; }
+  .scroll-fino { scrollbar-width:thin; scrollbar-color:#d3dae2 transparent; }
 
   /* ─── MÓDULO SUPERIOR ─── */
   .top-bar {
@@ -47,9 +64,9 @@
   .logo-sep { width:1px; height:28px; background:rgba(255,255,255,0.15); }
   .logo-crop { font-family:'Montserrat',sans-serif; font-weight:800; font-size:13px; color:rgba(255,255,255,0.5); letter-spacing:0.08em; }
   .logo-crop span { display:block; font-size:8px; font-weight:400; letter-spacing:0.1em; color:rgba(255,255,255,0.28); text-transform:uppercase; margin-top:2px; }
-  .mes-badge { display:inline-flex; align-items:center; gap:6px; background:var(--rojo); color:#fff; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border-radius:20px; }
+  .mes-badge { display:inline-flex; align-items:center; gap:6px; background:var(--rojo); color:#fff; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:5px 12px; border-radius:20px; white-space:nowrap; flex-shrink: 0; }
 
-  /* ─── TABS PRINCIPALES ─── */
+  /* ─── TABS PRINCIPALES (Scroll horizontal) ─── */
   .main-tabs {
     background:var(--gris-osc);
     padding:0 48px;
@@ -59,6 +76,8 @@
     top:64px;
     z-index:190;
     border-bottom:1px solid rgba(255,255,255,0.07);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .main-tab {
     padding:0 24px;
@@ -78,6 +97,7 @@
     cursor:pointer;
     transition:all .18s;
     white-space:nowrap;
+    flex-shrink: 0;
   }
   .main-tab svg { opacity:.5; transition:opacity .18s; }
   .main-tab:hover { color:rgba(255,255,255,0.7); }
@@ -107,18 +127,18 @@
   .hero-kpi-label { font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:5px; }
   .hero-kpi-valor { font-family:'Montserrat',sans-serif; font-weight:900; font-size:13px; color:rgba(255,255,255,0.88); }
 
-  .filtros-bar { background:#fff; border-bottom:1px solid var(--gris-borde); padding:0 48px; display:flex; align-items:center; gap:24px; height:58px; position:sticky; top:110px; z-index:90; overflow-x:auto; }
+  .filtros-bar { background:#fff; border-bottom:1px solid var(--gris-borde); padding:0 48px; display:flex; align-items:center; gap:24px; height:58px; position:sticky; top:var(--header-h); z-index:90; overflow-x:auto; -webkit-overflow-scrolling:touch; white-space:nowrap; }
   .filtros-label { font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gris); flex-shrink:0; }
   .filtros-grupo { display:flex; gap:5px; align-items:center; flex-shrink:0; }
   .filtros-sep { width:1px; height:22px; background:var(--gris-borde); flex-shrink:0; }
-  .filtro-btn { padding:4px 13px; border-radius:20px; border:1.5px solid var(--gris-borde); background:transparent; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--gris); cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .filtro-btn { padding:4px 13px; border-radius:20px; border:1.5px solid var(--gris-borde); background:transparent; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--gris); cursor:pointer; transition:all .15s; white-space:nowrap; flex-shrink: 0; }
   .filtro-btn:hover { border-color:var(--rojo); color:var(--rojo); }
   .filtro-btn.active     { background:var(--rojo);   border-color:var(--rojo);   color:#fff; }
   .filtro-btn.active-pos { background:var(--pos);    border-color:var(--pos);    color:#fff; }
   .filtro-btn.active-neg { background:var(--neg);    border-color:var(--neg);    color:#fff; }
   .filtro-btn.active-neu { background:var(--neu);    border-color:var(--neu);    color:#fff; }
 
-  /* ─── SELECTS DE PERÍODO (nuevo) ─── */
+  /* ─── SELECTS DE PERÍODO ─── */
   .filtro-select {
     appearance:none; -webkit-appearance:none; -moz-appearance:none;
     padding:5px 30px 5px 14px;
@@ -136,6 +156,7 @@
     cursor:pointer;
     transition:all .15s;
     white-space:nowrap;
+    flex-shrink: 0;
   }
   .filtro-select:hover { border-color:var(--rojo); }
   .filtro-select:focus { outline:none; border-color:var(--rojo); box-shadow:0 0 0 3px rgba(196,46,32,.12); }
@@ -186,9 +207,9 @@
 
   .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
   .chart-card { background:#fff; border-radius:12px; padding:26px 26px 22px; border:1px solid var(--gris-borde); }
-  .chart-card.full { grid-column:1 / -1; }
+  .chart-card.full { grid-column:1 / -1; overflow: hidden; }
   .chart-titulo { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); margin-bottom:20px; }
-  .chart-area { position:relative; height:250px; }
+  .chart-area { position:relative; height:250px; width: 100%; }
   .chart-area.tall { height:290px; }
   .chart-legend { display:flex; gap:18px; margin-top:14px; justify-content:center; flex-wrap:wrap; }
   .legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--gris); font-weight:500; }
@@ -213,7 +234,7 @@
   .ranking-card { background:#fff; border-radius:12px; border:1px solid var(--gris-borde); overflow:hidden; margin-bottom:18px; }
   .ranking-header { padding:18px 26px 14px; border-bottom:1px solid var(--fondo); }
   .ranking-titulo { font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); }
-  .ranking-body { padding:4px 0; }
+  .ranking-body { padding:4px 0; max-height:450px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .ranking-row { display:grid; grid-template-columns:32px 1fr 140px 36px; align-items:center; gap:12px; padding:9px 26px; border-bottom:1px solid var(--fondo); transition:background .1s; }
   .ranking-row:last-child { border-bottom:none; }
   .ranking-row:hover { background:var(--fondo); }
@@ -230,9 +251,9 @@
   .search-input { padding:6px 14px; border:1.5px solid var(--gris-borde); border-radius:20px; font-family:'Inter',sans-serif; font-size:12px; color:var(--negro); outline:none; width:210px; transition:border-color .15s; }
   .search-input:focus { border-color:var(--rojo); }
   .search-input::placeholder { color:var(--gris); }
-  .tabla-wrap { overflow-x:auto; }
+  .tabla-wrap { overflow-x:auto; overflow-y:auto; max-height:450px; -webkit-overflow-scrolling:touch; }
   table { width:100%; border-collapse:collapse; font-size:13px; }
-  thead th { background:var(--fondo); padding:9px 14px; text-align:left; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); border-bottom:1px solid var(--gris-borde); white-space:nowrap; }
+  thead th { background:var(--fondo); padding:9px 14px; text-align:left; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); border-bottom:1px solid var(--gris-borde); white-space:nowrap; position:sticky; top:0; z-index:5; }
   tbody td { padding:11px 14px; border-bottom:1px solid var(--fondo); color:#333; vertical-align:middle; }
   tbody tr:last-child td { border-bottom:none; }
   tbody tr:hover td { background:#fafafa; }
@@ -276,9 +297,10 @@
     display:flex;
     gap:0;
     position:sticky;
-    top:110px;
+    top:var(--header-h);
     z-index:89;
     overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
   }
   .ig-tab {
     padding:15px 20px;
@@ -296,6 +318,7 @@
     gap:7px;
     transition:all .15s;
     white-space:nowrap;
+    flex-shrink: 0;
   }
   .ig-tab:hover { color:var(--negro); }
   .ig-tab.active { color:var(--rojo); border-bottom-color:var(--rojo); }
@@ -388,8 +411,59 @@
     .kpi-card.principal { grid-column:1/-1; }
     .charts-grid { grid-template-columns:1fr; }
     .ig-tasks-grid { grid-template-columns:1fr; }
-    .ig-hero-right { align-items:flex-start; }
+    .ig-hero-right { align-items:flex-start; width:100%; }
     .comp-grid { grid-template-columns:1fr; }
+
+    /* ─── HERO (Net Sentiment) compacto en móvil ─── */
+    .hero { padding:24px 20px 26px; }
+    .hero::before { width:280px; height:280px; top:-70px; right:-70px; border-width:50px; }
+    .hero::after  { width:160px; height:160px; bottom:-40px; left:-40px; border-width:28px; }
+    .hero-eyebrow { font-size:9px; margin-bottom:10px; }
+    .hero-titulo { font-size:26px; margin-bottom:4px; }
+    .hero-sub { font-size:12px; margin-bottom:18px; }
+    .hero-kpis {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px 16px;
+    }
+    .hero-kpi {
+      padding:0 0 10px 0;
+      margin-right:0;
+      border-right:none;
+      border-bottom:1px solid rgba(255,255,255,0.1);
+    }
+    .hero-kpi-label { font-size:8px; margin-bottom:3px; }
+    .hero-kpi-valor { font-size:12px; }
+
+    /* ─── IG-HERO compacto en móvil ─── */
+    .ig-hero { padding:22px 20px 20px; }
+    .ig-hero::before { width:220px; height:220px; top:-60px; right:-60px; border-width:36px; }
+    .ig-hero::after  { width:120px; height:120px; bottom:-30px; left:-30px; border-width:20px; }
+    .ig-hero-inner { gap:16px; }
+    .ig-hero-left .ig-titulo { font-size:24px; }
+    .ig-hero-left .ig-sub { font-size:12px; margin-top:4px; }
+    .ig-hero-stats {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      width:100%;
+    }
+    .ig-hero-stat { text-align:left; }
+    .ig-hero-stat .stat-val { font-size:17px; }
+    .ig-hero-stat .stat-label { font-size:8px; }
+
+    /* ─── Scroll interno: en móvil se ajusta un poco la altura ─── */
+    .ranking-body, .tabla-wrap { max-height:360px; }
+    
+    /* ─── CORRECCIÓN DE GRÁFICAS Y SCROLL HORIZONTAL (Sin espacios blancos) ─── */
+    .chart-scroll-wrap { 
+        width: 100%; 
+        overflow-x: auto; 
+        -webkit-overflow-scrolling: touch; 
+        padding-bottom: 12px;
+    }
+    .chart-area.tall { min-width: 550px; height: 220px; } /* Obliga al scroll lateral */
+    .chart-area { height: 180px; } /* Reduce las donas para que no revienten la pantalla */
   }
 </style>
 </head>
@@ -416,7 +490,7 @@
 </header>
 
 <!-- ─── TABS PRINCIPALES ─── -->
-<nav class="main-tabs" role="tablist" aria-label="Módulos del informe">
+<nav class="main-tabs no-scrollbar" role="tablist" aria-label="Módulos del informe">
   <button class="main-tab active" role="tab" aria-selected="true"  onclick="showModule('ns', this)">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     Monitor de prensa · Net Sentiment
@@ -446,7 +520,7 @@
     </div>
   </div>
 
-  <div class="filtros-bar">
+  <div class="filtros-bar no-scrollbar">
     <div class="filtros-label">Período</div>
     <select class="filtro-select" id="filtroMesSelect" onchange="setMes(this.value)">
       <option value="Abril 2026">Abril 2026</option>
@@ -492,7 +566,9 @@
     <div class="charts-grid">
       <div class="chart-card full">
         <div class="chart-titulo">Tendencia diaria por sentimiento</div>
-        <div class="chart-area tall"><canvas id="chartTendencia"></canvas></div>
+        <div class="chart-scroll-wrap scroll-fino">
+           <div class="chart-area tall"><canvas id="chartTendencia"></canvas></div>
+        </div>
         <div class="chart-legend">
           <div class="legend-item"><div class="legend-dot" style="background:#2d8a5e"></div>Positivo</div>
           <div class="legend-item"><div class="legend-dot" style="background:#c42e20"></div>Negativo</div>
@@ -518,7 +594,7 @@
 
     <div class="ranking-card">
       <div class="ranking-header"><div class="ranking-titulo">Ranking de medios · más activos</div></div>
-      <div class="ranking-body" id="rankingBody"></div>
+      <div class="ranking-body scroll-fino" id="rankingBody"></div>
     </div>
 
     <div class="tabla-card">
@@ -526,7 +602,7 @@
         <div class="tabla-titulo">Notas detalladas</div>
         <input type="text" class="search-input" placeholder="Buscar nota o medio…" id="searchInput" oninput="render()">
       </div>
-      <div class="tabla-wrap">
+      <div class="tabla-wrap scroll-fino">
         <table>
           <thead><tr><th>Fecha</th><th>Medio</th><th>Canal</th><th>Titular</th><th>Sentimiento</th></tr></thead>
           <tbody id="tablaBody"></tbody>
@@ -565,7 +641,7 @@
     </div>
   </div>
 
-  <nav class="ig-subnav" role="tablist" aria-label="Secciones del informe">
+  <nav class="ig-subnav no-scrollbar" role="tablist" aria-label="Secciones del informe">
     <button class="ig-tab active" role="tab" onclick="showIgSec('obj',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       Objetivos
