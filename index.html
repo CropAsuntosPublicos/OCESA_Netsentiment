@@ -27,6 +27,20 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Inter',sans-serif; background:var(--fondo); color:var(--negro); line-height:1.5; -webkit-font-smoothing:antialiased; }
 
+  /* ─── SCROLL GENERAL DE LA PÁGINA (delgado, sin flechas) ─── */
+  html { scrollbar-width:thin; scrollbar-color:#d9d3d0 transparent; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:#d9d3d0; border-radius:10px; }
+  ::-webkit-scrollbar-thumb:hover { background:#c5bebb; }
+
+  /* ─── SCROLLBAR PERSONALIZADA ─── */
+  .scroll-fino::-webkit-scrollbar { width:6px; height:6px; }
+  .scroll-fino::-webkit-scrollbar-track { background:transparent; }
+  .scroll-fino::-webkit-scrollbar-thumb { background:#d9d3d0; border-radius:10px; }
+  .scroll-fino::-webkit-scrollbar-thumb:hover { background:#c5bebb; }
+  .scroll-fino { scrollbar-width:thin; scrollbar-color:#d9d3d0 transparent; }
+
   /* ─── MÓDULO SUPERIOR ─── */
   .top-bar {
     background:var(--negro);
@@ -228,9 +242,9 @@
   .search-input { padding:6px 14px; border:1.5px solid var(--gris-borde); border-radius:20px; font-family:'Inter',sans-serif; font-size:12px; color:var(--negro); outline:none; width:210px; transition:border-color .15s; }
   .search-input:focus { border-color:var(--rojo); }
   .search-input::placeholder { color:var(--gris); }
-  .tabla-wrap { overflow-x:auto; }
+  .tabla-wrap { overflow-x:auto; overflow-y:auto; max-height:65vh; }
   table { width:100%; border-collapse:collapse; font-size:13px; }
-  thead th { background:var(--fondo); padding:9px 14px; text-align:left; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); border-bottom:1px solid var(--gris-borde); white-space:nowrap; }
+  thead th { background:var(--fondo); padding:9px 14px; text-align:left; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gris); border-bottom:1px solid var(--gris-borde); white-space:nowrap; position:sticky; top:0; z-index:5; }
   tbody td { padding:11px 14px; border-bottom:1px solid var(--fondo); color:#333; vertical-align:middle; }
   tbody tr:last-child td { border-bottom:none; }
   tbody tr:hover td { background:#fafafa; }
@@ -278,6 +292,7 @@
     top:110px;
     z-index:89;
     overflow-x:auto;
+    overflow-y:hidden;
   }
   .ig-tab {
     padding:15px 20px;
@@ -361,6 +376,7 @@
   .ig-strip-stat .sv { font-family:'Montserrat',sans-serif; font-weight:900; font-size:18px; color:#fff; line-height:1; }
   .ig-strip-stat .sl { font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.38); margin-top:3px; }
 
+  .ig-media-scroll { max-height:65vh; overflow-y:auto; padding-right:6px; }
   .ig-media-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; }
   .ig-media-card { background:#fff; border-radius:12px; padding:20px; border:1px solid var(--gris-borde); text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:10px; transition:border-color .15s, transform .1s; }
   .ig-media-card:hover { border-color:var(--rojo); transform:translateY(-2px); }
@@ -521,7 +537,7 @@
         <div class="tabla-titulo">Notas detalladas</div>
         <input type="text" class="search-input" placeholder="Buscar nota o medio…" id="searchInput" oninput="render()">
       </div>
-      <div class="tabla-wrap">
+      <div class="tabla-wrap scroll-fino">
         <table>
           <thead><tr><th>Fecha</th><th>Medio</th><th>Canal</th><th>Titular</th><th>Sentimiento</th></tr></thead>
           <tbody id="tablaBody"></tbody>
@@ -617,7 +633,9 @@
         </div>
         <div class="ig-strip-right" id="igStripStats"></div>
       </div>
-      <div class="ig-media-grid" id="igMediaGrid"></div>
+      <div class="ig-media-scroll scroll-fino">
+        <div class="ig-media-grid" id="igMediaGrid"></div>
+      </div>
     </div>
 
   </div>
